@@ -1,0 +1,15 @@
+/* 마크다운 제목에 마우스 오버시 # 생기던 부분 제거 */
+h1 a::before,
+h2 a::before,
+h3 a::before,
+h4 a::before {
+    display:none;
+}
+
+/* Code block 드래그 색상 */
+code[class*="language-"]::selection,
+pre[class*="language-"]::selection,
+code[class*="language-"] ::selection,
+pre[class*="language-"] ::selection {
+    background-color:saddlebrown !important;
+}
