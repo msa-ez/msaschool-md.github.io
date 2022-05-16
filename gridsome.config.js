@@ -72,6 +72,74 @@ module.exports = {
               '/contact/question/'
             ]
           },
+          {
+            title: 'Business',
+            items:[
+              '/business/design-event/',
+              '/business/eventstorming-fooddelivery/',
+              '/business/ddd-google-drive/',
+              '/business/collaborative-eventstorming/',
+              '/business/design-to-code/',
+              '/business/zero-based-cna/',
+            ]
+          },
+          {
+            title: 'Development',
+            items:[
+              '/development/cna-start/',
+              '/development/gateway/',
+              '/development/oauth2/',
+              '/development/oauth2withkeycloak/',
+              '/development/keycloak-oauth2-1/',
+              '/development/keycloak-oauth2-2/',
+              '/development/keycloak-oauth2-3/',
+              '/development/front-end/',
+              '/development/monolith2misvc/',
+              '/development/circuitbreaker/',
+              '/development/kafka-base/',
+              '/development/cna-pubsub/',
+              '/development/cna-pubsub2/',
+              '/development/kafka-scaling/',
+              '/development/kafka-manual-commit/',
+              '/development/kafka-retry-dlq/',
+              '/development/advanced-connect/',
+              '/development/dp-composite-svc/',
+              '/development/dp-graphql/',
+              '/development/cqrs-modeling/',
+              '/development/dp-cqrs/',
+              '/development/contract-test/',
+              '/development/ops-docker/',
+              '/development/capstone-project-1/',
+              '/development/capstone-project-2/',
+            ]
+          },
+          {
+            title: 'Operations',
+            items:[
+              '/operations/azure/',
+              '/operations/ops-aws-setting/',
+              '/operations/ops-kubernetes/',
+              '/operations/ops-deploy-my-app/',
+              '/operations/end-to-end/',
+              '/operations/ops-readiness/',
+              '/operations/ops-liveness/',
+              '/operations/ops-autoscale/',
+              '/operations/ops-persistence-volume/',
+              '/operations/ops-ingress/',
+              '/operations/ops-ingress-virtualhost/',
+              '/operations/ops-service-mesh-istio/',
+              '/operations/istio-traffic/',
+              '/operations/istio-resiliency-part1/',
+              '/operations/istio-resiliency-part2/',
+              '/operations/istio-msa-telemetry/',
+              '/operations/k8s-monitoring/',
+              '/operations/msa-logging/',
+              '/operations/ops-argo-rollout-canary-istio/',
+              '/operations/gitops-argo-cd/',
+              '/operations/ops-anatomy-kubernetes/',
+              '/operations/ops-utility/',
+            ]
+          },
         ]
       }
     ]
