@@ -9,7 +9,7 @@
             class="flex items-center text-ui-primary"
             title="Home"
           >
-            <g-image src = "~/img/logo.png" width="120" class="text-ui-primary" />
+            <g-image src = "~/img/msaschool_logo.png" width="300" class="text-ui-primary" />
           </g-link>
 
           <!-- <div v-if="settings.nav.links.length > 0" class="hidden ml-2 mr-5 sm:block sm:ml-8">
