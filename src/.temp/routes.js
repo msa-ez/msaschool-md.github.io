@@ -44,19 +44,15 @@ export default [
     component: c1
   },
   {
-    path: "/ops/ops-argo-rollout-canary-istio/",
+    path: "/operations/ops-argo-rollout-canary-istio/",
     component: c1
   },
   {
-    path: "/ops/ops-deploy-my-app/",
+    path: "/operations/ops-deploy-my-app/",
     component: c1
   },
   {
-    path: "/ops/ops-ingress-virtual-host/",
-    component: c1
-  },
-  {
-    path: "/ops/ops-service-mesh-istio/",
+    path: "/operations/ops-service-mesh-istio/",
     component: c1
   },
   {
@@ -68,19 +64,19 @@ export default [
     component: c1
   },
   {
-    path: "/ops/ops-anatomy-kubernetes/",
+    path: "/operations/ops-anatomy-kubernetes/",
     component: c1
   },
   {
-    path: "/ops/ops-auto-scale/",
+    path: "/operations/ops-aws-setting/",
     component: c1
   },
   {
-    path: "/ops/ops-aws-setting/",
+    path: "/operations/ops-ingress-virtualhost/",
     component: c1
   },
   {
-    path: "/ops/ops-persistence-volume/",
+    path: "/operations/ops-persistence-volume/",
     component: c1
   },
   {
@@ -120,31 +116,35 @@ export default [
     component: c1
   },
   {
-    path: "/ops/ops-ingress/",
+    path: "/operations/ops-autoscale/",
     component: c1
   },
   {
-    path: "/ops/ops-kubernetes/",
+    path: "/operations/ops-ingress/",
     component: c1
   },
   {
-    path: "/ops/ops-liveness/",
+    path: "/operations/ops-kubernetes/",
     component: c1
   },
   {
-    path: "/ops/ops-readiness/",
+    path: "/operations/ops-liveness/",
     component: c1
   },
   {
-    path: "/ops/ops-utility/",
+    path: "/operations/ops-readiness/",
     component: c1
   },
   {
-    path: "/biz/zero-based-cna/",
+    path: "/operations/ops-utility/",
     component: c1
   },
   {
-    path: "/ops/msa-logging/",
+    path: "/business/zero-based-cna/",
+    component: c1
+  },
+  {
+    path: "/operations/msa-logging/",
     component: c1
   },
   {
@@ -152,19 +152,19 @@ export default [
     component: c1
   },
   {
-    path: "/ops/istio-resiliency-part-one/",
+    path: "/operations/k8s-monitoring/",
     component: c1
   },
   {
-    path: "/ops/istio-resiliency-part-two/",
+    path: "/operations/istio-msa-telemetry/",
     component: c1
   },
   {
-    path: "/ops/k8s-monitoring/",
+    path: "/operations/istio-resiliency-part1/",
     component: c1
   },
   {
-    path: "/ops/istio-msa-telemetry/",
+    path: "/operations/istio-resiliency-part2/",
     component: c1
   },
   {
@@ -172,7 +172,7 @@ export default [
     component: c1
   },
   {
-    path: "/ops/istio-traffic/",
+    path: "/operations/istio-traffic/",
     component: c1
   },
   {
@@ -180,7 +180,7 @@ export default [
     component: c1
   },
   {
-    path: "/ops/gitops-argo-cd/",
+    path: "/operations/gitops-argo-cd/",
     component: c1
   },
   {
@@ -188,19 +188,19 @@ export default [
     component: c1
   },
   {
-    path: "/ops/end-to-end/",
+    path: "/operations/end-to-end/",
     component: c1
   },
   {
-    path: "/dev/oauth2-with-keycloak/",
+    path: "/development/ops-docker/",
     component: c1
   },
   {
-    path: "/dev/ops-docker/",
+    path: "/development/oauth2/",
     component: c1
   },
   {
-    path: "/dev/oauth2/",
+    path: "/development/oauth2withkeycloak/",
     component: c1
   },
   {
@@ -256,43 +256,43 @@ export default [
     component: c1
   },
   {
-    path: "/dev/monolith2-misvc/",
-    component: c1
-  },
-  {
     path: "/planning/avatar-pattern/",
     component: c1
   },
   {
-    path: "/dev/kafka-manual-commit/",
+    path: "/development/kafka-manual-commit/",
     component: c1
   },
   {
-    path: "/dev/kafka-retry-dlq/",
+    path: "/development/kafka-retry-dlq/",
     component: c1
   },
   {
-    path: "/dev/keycloak-oauth2-1/",
+    path: "/development/keycloak-oauth2-1/",
     component: c1
   },
   {
-    path: "/dev/keycloak-oauth2-2/",
+    path: "/development/keycloak-oauth2-2/",
     component: c1
   },
   {
-    path: "/dev/keycloak-oauth2-3/",
+    path: "/development/keycloak-oauth2-3/",
     component: c1
   },
   {
-    path: "/dev/kafka-base/",
+    path: "/development/monolith2misvc/",
     component: c1
   },
   {
-    path: "/dev/kafka-scaling/",
+    path: "/development/kafka-base/",
     component: c1
   },
   {
-    path: "/ops/azure/",
+    path: "/development/kafka-scaling/",
+    component: c1
+  },
+  {
+    path: "/operations/azure/",
     component: c1
   },
   {
@@ -308,19 +308,15 @@ export default [
     component: c1
   },
   {
-    path: "/dev/front-end/",
+    path: "/development/front-end/",
     component: c1
   },
   {
-    path: "/dev/gateway/",
+    path: "/development/gateway/",
     component: c1
   },
   {
-    path: "/dev/dp-composite-svc/",
-    component: c1
-  },
-  {
-    path: "/biz/eventstorming-food-delivery/",
+    path: "/development/dp-composite-svc/",
     component: c1
   },
   {
@@ -372,51 +368,51 @@ export default [
     component: c1
   },
   {
-    path: "/dev/capstone-project-one/",
+    path: "/development/capstone-project-1/",
     component: c1
   },
   {
-    path: "/dev/capstone-project-two/",
+    path: "/development/capstone-project-2/",
     component: c1
   },
   {
-    path: "/dev/cna-pubsub-one/",
+    path: "/development/dp-cqrs/",
     component: c1
   },
   {
-    path: "/dev/cna-pubsub-two/",
+    path: "/development/dp-graphql/",
     component: c1
   },
   {
-    path: "/dev/dp-cqrs/",
+    path: "/business/ddd-google-drive/",
     component: c1
   },
   {
-    path: "/dev/dp-graphql/",
+    path: "/business/design-to-code/",
     component: c1
   },
   {
-    path: "/biz/ddd-google-drive/",
+    path: "/business/eventstorming-fooddelivery/",
     component: c1
   },
   {
-    path: "/biz/design-to-code/",
+    path: "/development/cna-pubsub/",
     component: c1
   },
   {
-    path: "/dev/circuit-breaker/",
+    path: "/development/cna-pubsub2/",
     component: c1
   },
   {
-    path: "/dev/cna-start/",
+    path: "/development/cna-start/",
     component: c1
   },
   {
-    path: "/dev/contract-test/",
+    path: "/development/contract-test/",
     component: c1
   },
   {
-    path: "/dev/cqrs-modeling/",
+    path: "/development/cqrs-modeling/",
     component: c1
   },
   {
@@ -424,7 +420,7 @@ export default [
     component: c1
   },
   {
-    path: "/biz/design-event/",
+    path: "/business/design-event/",
     component: c1
   },
   {
@@ -436,11 +432,15 @@ export default [
     component: c1
   },
   {
-    path: "/biz/collaborative-eventstorming/",
+    path: "/development/circuitbreaker/",
     component: c1
   },
   {
-    path: "/dev/advanced-connect/",
+    path: "/business/collaborative-eventstorming/",
+    component: c1
+  },
+  {
+    path: "/development/advanced-connect/",
     component: c1
   },
   {

@@ -12,12 +12,12 @@
             </g-link>
           </div>
 
-        <div class="order-2 w-full md:w-1/3 sm:pl-4 md:pl-6 lg:pl-8 sticky" style="top: 4rem">
+        <!-- <div class="order-2 w-full md:w-1/3 sm:pl-4 md:pl-6 lg:pl-8 sticky" style="top: 4rem">
           <OnThisPage />
-        </div>
+        </div> -->
 
-        <div class="order-1 w-full md:w-2/3">
-          <div class="content" v-html="$page.markdownPage.content" />
+        <div class="order-1 w-full">
+          <div class="content" v-html="$page.markdownPage.content" style="min-width:1350px;"/>
 
           <div class="mt-8 pt-8 lg:mt-12 lg:pt-12 border-t border-ui-border">
             <NextPrevLinks />
@@ -58,14 +58,14 @@ query ($id: ID!) {
 </page-query>
 
 <script>
-import OnThisPage from '@/components/OnThisPage.vue';
+// import OnThisPage from '@/components/OnThisPage.vue';
 import NextPrevLinks from '@/components/NextPrevLinks.vue';
 import { ArrowRightCircleIcon, ZapIcon, CodeIcon, MoonIcon, SearchIcon } from 'vue-feather-icons';
 
 
 export default {
   components: {
-    OnThisPage,
+    // OnThisPage,
     NextPrevLinks,
     ArrowRightCircleIcon
   },
