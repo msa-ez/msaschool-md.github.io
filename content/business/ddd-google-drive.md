@@ -1,6 +1,6 @@
 ---
 description: ''
-sidebar: 'information'
+sidebar: 'business'
 ---
 
 # [이벤트스토밍] DDD 구글 드라이브 예제

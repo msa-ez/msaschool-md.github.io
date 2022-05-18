@@ -17,147 +17,17 @@ module.exports = {
     github: process.env.URL_GITHUB || false,
     nav: {
       links: [
-        { path: '/introduction/', title: 'Docs' }
+        { path: '/business/', title: 'Docs' }
       ]
     },
     sidebar: [
       {
-        name: 'introduction',
+        name: 'business',
         sections: [
           {
-            title: '소개',
-            items: [
-              '/introduction/',
-              '/introduction/used-platform/',
-              '/introduction/example-application/',
-              '/introduction/related-resource/',
-              '/introduction/util-and-tool/',
-            ]
-          },
-          {
-            title: '계획',
-            items: [
-              '/planning/step-by-step-goal/',
-              '/planning/segmentation-level/',
-              '/planning/avatar-pattern/',
-              '/planning/planning/',
-              '/planning/system-security/',
-              '/planning/performance-measures/',
-              '/planning/test-measures/',
-            ]
-          },
-          {
-            title: '분석',
-            items: [
-              '/analysis/analysis-one/',
-              '/analysis/analysis-two/',
-              '/analysis/analysis-three/',
-            ]
-          },
-          {
-            title: '설계',
+            title: 'Biz',
             items:[
-              '/design/design-one/',
-              '/design/design-two/',
-              '/design/design-three/',
-              '/design/design-four/',
-              '/design/design-five/',
-              '/design/design-six/',
-              '/design/design-seven/',
-              '/design/design-eight/',
-            ]
-          },
-          {
-            title: '구현',
-            items: [
-              '/implementation/implementation-one/',
-              '/implementation/implementation-two/',
-              '/implementation/implementation-three/',
-              '/implementation/implementation-four/',
-              '/implementation/implementation-five/',
-              '/implementation/implementation-six/',
-              '/implementation/implementation-seven/',
-            ]
-          },
-          {
-            title: '통합',
-            items: [
-              '/integration/integration-one/',
-              '/integration/integration-two/',
-              '/integration/integration-three/',
-              '/integration/integration-four/',
-              '/integration/integration-five/',
-              '/integration/integration-six/',
-            ]
-          },
-          {
-            title: '배포',
-            items: [
-              '/deployment/deployment-one/',
-              '/deployment/deployment-two/',
-              '/deployment/deployment-three/',
-              '/deployment/deployment-four/',
-            ]
-          },
-          {
-            title: '운영',
-            items: [
-              '/operation/operation-one/',
-              '/operation/operation-two/',
-              '/operation/operation-three/',
-              '/operation/operation-four/',
-              '/operation/operation-five/',
-              '/operation/operation-six/',
-              '/operation/operation-seven/',
-            ]
-          },
-          {
-            title: '트러블 슈팅',
-            items: [
-              '/checkpoint/checkpoint-one/',
-              '/checkpoint/checkpoint-two/',
-            ]
-          },
-          {
-            title: 'MSA 전환전략',
-            items: [
-              '/strategy/strategy-one/',
-              '/strategy/strategy-two/',
-              '/strategy/strategy-three/',
-            ]
-          },
-          {
-            title: 'MSA 도구',
-            items: [
-              '/tool/tool-one/',
-              '/tool/tool-two/',
-              '/tool/tool-three/',
-            ]
-          },
-          {
-            title: 'MSA OUTER 아키텍처',
-            items: [
-              '/architecture/architecture-one/',
-              '/architecture/architecture-two/',
-              '/architecture/architecture-three/',
-              '/architecture/architecture-four/',
-              '/architecture/architecture-five/',
-            ]
-          },
-          {
-            title: '교육 및 커뮤니티',
-            items: [
-              '/education/quick-understanding-cna/',
-              '/education/standard-cna/',
-              '/education/flipped-learning-cna/',
-              '/education/one-point-lesson/',
-              '/education/enterprise-full-day/',
-              '/education/community/',
-            ]
-          },
-          {
-            title: 'Business',
-            items:[
+              '/business/',
               '/business/design-event/',
               '/business/eventstorming-fooddelivery/',
               '/business/ddd-google-drive/',
@@ -167,7 +37,7 @@ module.exports = {
             ]
           },
           {
-            title: 'Development',
+            title: 'Dev',
             items:[
               '/development/cna-start/',
               '/development/gateway/',
@@ -197,7 +67,7 @@ module.exports = {
             ]
           },
           {
-            title: 'Operations',
+            title: 'Ops',
             items:[
               '/operations/azure/',
               '/operations/ops-aws-setting/',

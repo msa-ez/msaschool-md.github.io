@@ -1,6 +1,6 @@
 ---
 description: ''
-sidebar: 'information'
+sidebar: 'business'
 ---
 
 # [설계] ES모델기반 템플릿 코드 분석

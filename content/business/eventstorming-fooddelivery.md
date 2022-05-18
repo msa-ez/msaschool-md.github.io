@@ -1,6 +1,6 @@
 ---
 description: ''
-sidebar: 'information'
+sidebar: 'business'
 ---
 
 # [이벤트스토밍] DDD Food Delivery 예제

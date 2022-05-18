@@ -1,6 +1,6 @@
 ---
 description: ''
-sidebar: 'information'
+sidebar: 'business'
 ---
 
 # [설계] ES모델 기반 Inner 아키텍처 이해

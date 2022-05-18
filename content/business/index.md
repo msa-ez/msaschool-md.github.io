@@ -1,6 +1,6 @@
 ---
 description: ''
-sidebar: 'information'
+sidebar: 'business'
 ---
 # [분석] DDD 이벤트의 도출 - 12번가 쇼핑몰
 
