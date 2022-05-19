@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-meta="%7B%22lang%22:%7B%22ssr%22:%22en%22%7D%7D">
+  <head>
+    <title>[설계] ES모델 기반 Inner 아키텍처 이해 - msaez</title><meta name="gridsome:hash" content="639846ab77f2d650b364be948c0c3d68be620b02"><meta data-vue-meta="ssr" charset="utf-8"><meta data-vue-meta="ssr" name="generator" content="Gridsome v0.7.23"><meta data-vue-meta="ssr" key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-meta="ssr" key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-argo-rollout-canary-istio/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-deploy-my-app/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-service-mesh-istio/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-anatomy-kubernetes/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-aws-setting/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-ingress-virtualhost/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-persistence-volume/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-autoscale/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-ingress/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-kubernetes/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-liveness/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-readiness/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-utility/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/business/zero-based-cna/"><meta data-vue-meta="ssr" name="description" content="undefined"><meta data-vue-meta="ssr" key="og:title" name="og:title" content="[설계] ES모델 기반 Inner 아키텍처 이해"><meta data-vue-meta="ssr" key="twitter:title" name="twitter:title" content="[설계] ES모델 기반 Inner 아키텍처 이해"><meta data-vue-meta="ssr" key="og:description" name="og:description" content="undefined"><meta data-vue-meta="ssr" key="twitter:description" name="twitter:description" content="undefined"><meta data-vue-meta="ssr" key="og:type" name="og:type" content="website"><meta data-vue-meta="ssr" key="twitter:card" name="twitter:card" content="summary_large_image"><meta data-vue-meta="ssr" key="og:image" name="og:image" content="undefined/logo.jpg"><meta data-vue-meta="ssr" key="twitter:image" name="twitter:image" content="undefined/logo.jpg"><link data-vue-meta="ssr" rel="icon" href="data:,"><link data-vue-meta="ssr" rel="icon" type="image/png" sizes="16x16" href="/assets/static/favicon.ce0531f.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="icon" type="image/png" sizes="32x32" href="/assets/static/favicon.ac8d93a.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="icon" type="image/png" sizes="96x96" href="/assets/static/favicon.b9532cc.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="76x76" href="/assets/static/favicon.f22e9f3.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="152x152" href="/assets/static/favicon.62d22cb.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="120x120" href="/assets/static/favicon.1539b60.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="167x167" href="/assets/static/favicon.dc0cdc5.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/static/favicon.7b22250.f0886199c685a75a52fccefb5e72c094.png"><link rel="preload" href="/assets/css/0.styles.b9f2c2f4.css" as="style"><link rel="preload" href="/assets/js/app.fc6ca2d6.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--markdown-page-vue.337d2322.js" as="script"><link rel="prefetch" href="/assets/js/page--src--pages--404-vue.fe9494d9.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.bc04380e.js"><link rel="prefetch" href="/assets/js/search.cdc1ffc3.js"><link rel="stylesheet" href="/assets/css/0.styles.b9f2c2f4.css"><noscript data-vue-meta="ssr"><style>.g-image--loading{display:none;}</style></noscript>
+  </head>
+  <body >
+    <div data-server-rendered="true" id="app" class="font-sans antialiased text-ui-typo bg-ui-background"><div class="flex flex-col justify-start min-h-screen"><header class="sticky top-0 z-10 w-full border-b bg-ui-background border-ui-border"><div class="py-2 border-t-2 border-ui-primary"><div class="container"><div class="flex items-center justify-between -mx-2 sm:-mx-4"><div class="flex flex-col items-center px-2 mr-auto sm:px-4 sm:flex-row"><a href="/" title="Home" class="flex items-center text-ui-primary active"><img src="data:image/svg+xml,%3csvg fill='none' viewBox='0 0 300 82' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3cdefs%3e%3cfilter id='__svg-blur-d11350692290831d900d696f65124740'%3e%3cfeGaussianBlur in='SourceGraphic' stdDeviation='40'/%3e%3c/filter%3e%3c/defs%3e%3cimage x='0' y='0' filter='url(%23__svg-blur-d11350692290831d900d696f65124740)' width='300' height='82' xlink:href='data:image/png%3bbase64%2ciVBORw0KGgoAAAANSUhEUgAAAEAAAAARCAYAAABtu6qMAAAACXBIWXMAAAsTAAALEwEAmpwYAAAI50lEQVRYw91XeVRU1xm/b6ioMWqr2CY5p8eTnJhUPU3aJF2OtolNc9KSGKuyLwKCLAMzyCLDMsOsLA4wwAz7NgsMzMCwD/sOBkXZVJZYIUoSFY11OW0a4kJfv3tn3ghtT/o/c8477y7fffd%2bv%2b/3/e43CMFvZvImivGrwk0Ue8KIssUdKC%2b5G%2bUkdaGi9H6kErahlb/J4Wtozfz%2b%2bc0jFOmtJ%2b2Y4wbk82Eh63/ZtRnGHVsNYyHfLT3%2bAe6f77u6NgAQh9eTd3xQjW2MpmnK%2btjh/kj/3EutVWM3Jnr%2bRvc2Xj6Ax9qrJ1hrAgBfxyKUFNXEOI44brriECfNNbaTZhaeGXgWI7z0bJjb2lN/ST5gnt6FbQfMUxR%2bl2UPoBxZF1VdOkK%2bkRZvJm%2bNchCV550h7dLMfpQlbKeU0k7UZpq07a2SdaLc5C7SDnPRokbjMCoq1ZK%2b3mBCRSUaqkRdjsYmLpIxnd6AGptaSbu%2bwYyqTQ3o9uJt0h8cGv5ePxubLWnc3NKODNV1qKOr99lkyFE1oXW4Rzk70qOOZh/VwVNOc1wMNIBxOyG4ZhtJkQDjb/wOlhLbFvMsyhS2277xwZ5UzBjSzhC02sZF3DrKHvlRTN/j/TzSBqBtY1E%2blaR93F1iYaVMDv31tm9wInjUSmfu3Xuwyjl6eXkle9HsZ39FV%2bc%2bt43NzVvaDx/%2bfdW6pW%2bXEOL5G8jHJSfrt0O0vw45oqGDj6ifBB0ue8RxqaQh%2bh54XhbZ8NtT3nV01LFKH9wPddaS9CiQ967raZreYvnku2h8%2bDpzENbkyMI6ZjOFoO2FmrKR53H7wK5ksuf02Fcbb1y/twG3YW8yFsXj25zNLyp7ESK2Cbdf3fM2KihWU7wEsR0Awrpz5y5raek7%2b6TUDLvo2EQ7VV4RWafIzqNi4kV2Ytlp1vDZ8wQQAJTFSxDZJQhlJEjLT5fX4xQnm/g5FttZI6Lkuhqx848xABznKjrURdvDHEYYVusBh7wJY4uGknPPMePyOPO%2bUBfNg7hAoz/u2yNfFt4kwqvi0xh/Q6Sx5Nw2YFYX1103Bc882PGxnTSi4XVYNx/mqp1VJLa9TNgSW0LOkp1TuDtBmNQLB74Mz9UUeSbnPykNju8VSlNXXU%2bJ4hS7lf0/f%2bJMefkFrWKPPEP5El%2bUPAbgvmIbPOVX9QakwXLQYTUGAN5ldMhRDR3tW/UrPB/hrT8W7VtZAFTNj/ZspsGhWMtKR4yofeDhsluw5u6tL%2b4TYBJDaz%2bOdG%2bmeQGG6AjvilJwctIiuHWvwHOC5LyrNgVAP8dx1w2Fe5bn4jGvwyJ7/E5IlHXE8iV91ojuUijzvHC7uEz3k0RJSrg0Jf2gLDXj97F88XxqeraHQJwcUK43brfavAg2nJS0rPcZ/1LTst6DsSi1Vv%2bCXKF0OBUnfAwg77EBAFE1cSHfceQxAzAT4HAqSz63bea6l3fGnTCmYpBCjmixLtyD1NnOrGe7aEZCnfT0qeNVxDmuR3kvx6Ua92NAPz4CZ%2bcjj%2bl1UT76g8wasOkXsE2OQk7tH2B/ApDjgXASQZHsdECcQPIZHLpUJD1N1uQWlO6MT5TO8kVJRhhvUGTnCiJj%2bA8g6k3Akr44gbS1orL65XiBdBbmq6C/AEAFJMszPWDdNNjpYexKRnbuhwDAojK3aO9KAGo5FgAehWABBOWHKO4g0ffSZ0H0GwGEgTCnSmyDAbjP8zc6MFcmOHgBom0C0PoSw2rdgSETwJohrodOiW3gNtgE86444pAG9X0tMzsAzIcQfSV%2bQpzU9wvlvT8mgnxCQkCob2zZJE1Od4fDj8Dhc8CpFGgPMGc%2bnZ79DuT1AqM3AMwFAM4MGkEUGNLDB4C5yBcmzQCb3K3MagM7PS9eNJelKvj5yhR4Ew70L6DxE66rgT7pWRFsEb7G3WxnzVLwUcwMDY2FEbMDwCB5/PYOATksvjZB7d3AuRa2k44Wcer8wNkmDABoxH6oLn%2bH7QShpj/C974GkKKCjpQt4rSCJx8AuAtn8GTOk56Vcwhy/C1rzn4MVP8KKC%2bG9zQR3mL1tjSFyjs2QTw1cfGyfWGJ9ocCUfJZSVKaHsZGibNCmQycHYD0GARQSMoCqyaFklQVMOBGpjL/DasIFjEimBXt2USDup9hDgKRrMPMAMefQuSf4qsR5q%2bpswc3WCxITYSA3sOSiPp94KgrsOEWjgiMGUEEeXy26S8AzHXI83GYW4gLrA4EOwVoQxazD9glxxyvyl8hcEEQ7TkQq3Gg9OeSJHkIZhpEsxEcG08UJw8DSHHAipbRscn1DU2tm0Dpu0HY3gGbBnB8DNZfTVMo3wWgfg1rLsH4GDCgq6BYsxf603mFZa%2bRzXgBRqKSEBUHoP5tuOb%2bZGXFB6HO5dh5rAtPLddiFQ1ls7s1bWyK22a6uKVBP7oOq/%2bdmw%2bJEJqNE5trtRdIu7txaiNowW6VtNPBmhJbes3TG/btlLD2bollXR790r5GfX4rnvvokBs5T0tb53Og/ruhEHJYqeJpmao3gb4/Jfu2d2/Fe96CYqizu2%2brTekVql/oKp5pVJlG7wBMeou5%2blrbu340Nj75rJJ1/GUGeecmde3Hbz67dh1Eep7rYiRFEdaFCLdafC124/n9O6VUUVofVHiD6LWNEf9VdYFA2toBh0pWlcxu7%2bXY%2brrcM6h1RWXI5%2brIO5B9ctXV5R/EZZWqy6n/V9V6%2bQat6oNIUsCEVfsHh0Xa2v0DQPZm/Shq0p4nRh01E8VQ4ibFBhi9sBBay%2bErkONzAMgIsOJV8mFv/aqP5qd2I23OEFJDWYzblrEeVCi3lBFZonYEak%2bl8ppJIYJtmBIY/0oUfagwzVKa7v9ZJHr6ZBnnOQL6UsrcQmrhiy8tkdTqsT5QWap8ytzagdS6SvTtP75BZ0dGka7CCOVtH8KlM7bB65jvw5VHpWfmsApLNOjS1Awq1VRQTGmMRgfnUHXhp5QFgMmQTtNk3FDHlc2Muq78U2TVBWILIKE19dOrBr%2bXYnuej7U5H3CwBKUntK4Jv/8Nl9Or%2bZJ%2b%2btwAAAAASUVORK5CYII=' /%3e%3c/svg%3e" width="300" data-src="/assets/static/msaschool_logo.6b65613.de89ab5f2636ecdd884e540e6ce8a652.png" data-srcset="/assets/static/msaschool_logo.6b65613.de89ab5f2636ecdd884e540e6ce8a652.png 300w" data-sizes="(max-width: 300px) 100vw, 300px" class="text-ui-primary g-image g-image--lazy g-image--loading"><noscript><img src="/assets/static/msaschool_logo.6b65613.de89ab5f2636ecdd884e540e6ce8a652.png" class="text-ui-primary g-image g-image--loaded" width="300"></noscript></a></div><div class="w-full px-2 sm:px-4 max-w-screen-xs"><!----></div><div class="flex items-center justify-end px-2 sm:px-4"><!----><!----><!----><div style="width:50px; height:50px; text-aling:center; line-height:50px; font-weight:700;"><a href="https://intro.msaez.io">English</a></div><button aria-label="Toggle Darkmode" title="Toggle Darkmode" class="ml-2 sm:ml-8"><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></button></div></div></div></div></header><main class="container relative flex flex-wrap justify-start flex-1 w-full bg-ui-background"><!----><div class="w-full pb-24"><div class="flex flex-wrap items-start justify-start"><div><a href="http://www.msaez.io/" target="_blank" rel="noopener" class="flex items-center px-1 py-1 ml-auto text-1xl font-bold leading-none text-white border rounded-lg shadow-lg bg-ui-primary border-ui-primary transition-all duration-200 ease-out transform hover:shadow-xl hover:-translate-y-1" style="position:absolute;top:5px;">
+            실습하기
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1 feather feather-arrow-right-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></div><div class="order-1 w-full md:w-2/3"><div class="content"><h1 id="설계-es모델-기반-inner-아키텍처-이해"><a href="#%EC%84%A4%EA%B3%84-es%EB%AA%A8%EB%8D%B8-%EA%B8%B0%EB%B0%98-inner-%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98-%EC%9D%B4%ED%95%B4" aria-hidden="true"><span class="icon icon-link"></span></a>[설계] ES모델 기반 Inner 아키텍처 이해</h1>
+<h3 id="productchanged-이벤트를-가진-product-마이크로서비스"><a href="#productchanged-%EC%9D%B4%EB%B2%A4%ED%8A%B8%EB%A5%BC-%EA%B0%80%EC%A7%84-product-%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C%EC%84%9C%EB%B9%84%EC%8A%A4" aria-hidden="true"><span class="icon icon-link"></span></a>ProductChanged 이벤트를 가진 Product 마이크로서비스</h3>
+<p>이벤트스토밍 결과를 Cloud Native Application(CNA) 구축 시 많이 적용되는 Spring Boot(스프링 부트)와 Event-Driven 방식을 사용하여, 온-사이트에 적용가능한  코드 구현을 진행합니다.</p>
+<h4 id="1-스프링-부트를-처음-시작할-때-가장-좋은-방법은-httpsstartspringio-에서-시작하는-것입니다-브라우저에서-다음-사이트를-접속하여-스프링-부트를-시작합니다"><a href="#1-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8%EB%A5%BC-%EC%B2%98%EC%9D%8C-%EC%8B%9C%EC%9E%91%ED%95%A0-%EB%95%8C-%EA%B0%80%EC%9E%A5-%EC%A2%8B%EC%9D%80-%EB%B0%A9%EB%B2%95%EC%9D%80-httpsstartspringio-%EC%97%90%EC%84%9C-%EC%8B%9C%EC%9E%91%ED%95%98%EB%8A%94-%EA%B2%83%EC%9E%85%EB%8B%88%EB%8B%A4-%EB%B8%8C%EB%9D%BC%EC%9A%B0%EC%A0%80%EC%97%90%EC%84%9C-%EB%8B%A4%EC%9D%8C-%EC%82%AC%EC%9D%B4%ED%8A%B8%EB%A5%BC-%EC%A0%91%EC%86%8D%ED%95%98%EC%97%AC-%EC%8A%A4%ED%94%84%EB%A7%81-%EB%B6%80%ED%8A%B8%EB%A5%BC-%EC%8B%9C%EC%9E%91%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>1. 스프링 부트를 처음 시작할 때 가장 좋은 방법은 <a href="https://start.spring.io/" target="_blank" rel="noopener noreferrer">https://start.spring.io/</a> 에서 시작하는 것입니다. 브라우저에서 다음 사이트를 접속하여 스프링 부트를 시작합니다.</h4>
+<ul>
+<li><a href="https://start.spring.io/" target="_blank" rel="noopener noreferrer">https://start.spring.io/</a></li>
+</ul>
+<h4 id="2-옵션"><a href="#2-%EC%98%B5%EC%85%98" aria-hidden="true"><span class="icon icon-link"></span></a>2. 옵션</h4>
+<ul>
+<li>Project : Maven</li>
+<li>Language : Java</li>
+<li>Spring Boot 버전 2.5.8 선택 </li>
+<li>Packaging : Jar</li>
+<li>java Version : 11</li>
+</ul>
+<h4 id="3-maven-project-와-java-를-선택하고-디펜던시dependencies에-다음-3개를-추가해-generate-버튼으로-다운로드-받은-후-idevs-code에-프로젝트를-로드-합니다"><a href="#3-maven-project-%EC%99%80-java-%EB%A5%BC-%EC%84%A0%ED%83%9D%ED%95%98%EA%B3%A0-%EB%94%94%ED%8E%9C%EB%8D%98%EC%8B%9Cdependencies%EC%97%90-%EB%8B%A4%EC%9D%8C-3%EA%B0%9C%EB%A5%BC-%EC%B6%94%EA%B0%80%ED%95%B4-generate-%EB%B2%84%ED%8A%BC%EC%9C%BC%EB%A1%9C-%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C-%EB%B0%9B%EC%9D%80-%ED%9B%84-idevs-code%EC%97%90-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%EB%A5%BC-%EB%A1%9C%EB%93%9C-%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>3. Maven Project 와 Java 를 선택하고, 디펜던시(Dependencies)에 다음 3개를 추가해 Generate 버튼으로 다운로드 받은 후, IDE(VS Code)에 프로젝트를 로드 합니다.</h4>
+<ul>
+<li>
+<ol>
+<li>Rest Repositories : 레파지토리 패턴을 통해 CRUD API를 생성해 줍니다.</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>Spring Data JPA : Java Persistence API의 약어, 자바 ORM 기술에 대한 표준 명세로 API 기반 영속성 관리 도구</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>H2 : Java 기반 오픈소스 인메모리 DB</li>
+</ol>
+</li>
+</ul>
+<h4 id="좌측-explorer에서-우클릭-후-demozip을-ide에-load"><a href="#%EC%A2%8C%EC%B8%A1-explorer%EC%97%90%EC%84%9C-%EC%9A%B0%ED%81%B4%EB%A6%AD-%ED%9B%84-demozip%EC%9D%84-ide%EC%97%90-load" aria-hidden="true"><span class="icon icon-link"></span></a>좌측 Explorer에서 우클릭 후 demo.zip을 IDE에 Load</h4>
+<pre class="language-bash"><code class="language-bash"><span class="token function">unzip</span> demo.zip</code></pre>
+<h4 id="3-먼저-aggregate-를-생성-합니다"><a href="#3-%EB%A8%BC%EC%A0%80-aggregate-%EB%A5%BC-%EC%83%9D%EC%84%B1-%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>3. 먼저, Aggregate 를 생성 합니다.</h4>
+<ul>
+<li>Aggregate 는 이벤트 스토밍의 노란색 결과 입니다.</li>
+<li>Product Class 를 생성 합니다.</li>
+<li>상품 Entity 를 id, name, stock 맴버 변수를 가진 정의하고 get,set 메서드를 생성하여 줍니다.</li>
+<li>클레스 상단에 @Entity 어노테이션을 달아서 Aggregate 선언을 하여 줍니다.</li>
+<li>@Entity 어노테이션은 JPA 방식을 사용합니다. 이는 Id 값이 필수입니다.</li>
+<li>id 로 선언한 변수에 @Id @GeneratedValue 를 선언하여 줍니다.</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>demo</span><span class="token punctuation">;</span>
+<span class="token annotation punctuation">@Entity</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Product</span> <span class="token punctuation">{</span>
+
+    <span class="token annotation punctuation">@Id</span> <span class="token annotation punctuation">@GeneratedValue</span>
+    <span class="token class-name">Long</span> id<span class="token punctuation">;</span>
+    <span class="token class-name">String</span> name<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> stock<span class="token punctuation">;</span>
+
+    <span class="token comment">// get/set 메서드</span>
+<span class="token punctuation">}</span></code></pre>
+<ul>
+<li>import 문 추가 </li>
+</ul>
+<pre class="language-javascript"><code class="language-javascript"><span class="token keyword module">import</span> javax<span class="token punctuation">.</span><span class="token property-access">persistence</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">Entity</span></span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> javax<span class="token punctuation">.</span><span class="token property-access">persistence</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">GeneratedValue</span></span><span class="token punctuation">;</span>
+<span class="token keyword module">import</span> javax<span class="token punctuation">.</span><span class="token property-access">persistence</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">Id</span></span><span class="token punctuation">;</span></code></pre>
+<h4 id="4-command-를-생성-합니다"><a href="#4-command-%EB%A5%BC-%EC%83%9D%EC%84%B1-%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>4. Command 를 생성 합니다.</h4>
+<ul>
+<li>ProductRepository interface 를 생성하여 줍니다.</li>
+<li>CrudRepository&#x3C;Product, Long> 를 extends 하여 줍니다.</li>
+<li>CrudRepository&#x3C;> 의 두개의 변수는 Entity Type과 Primary Key(Entity Id) Type 입니다.</li>
+<li>위와같이 선언만 하면, Entity 의 Repository 패턴이 자동 생성되어, Product 엔터티의 CRUD에 해당되는 API 가 자동으로 생성이 됩니다.</li>
+</ul>
+<pre class="language-javascript"><code class="language-javascript"><span class="token keyword">package</span> com<span class="token punctuation">.</span><span class="token property-access">example</span><span class="token punctuation">.</span><span class="token property-access">demo</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">ProductRepository</span> <span class="token keyword">extends</span> <span class="token class-name">CrudRepository</span><span class="token operator">&lt;</span><span class="token maybe-class-name">Product</span><span class="token punctuation">,</span> <span class="token maybe-class-name">Long</span><span class="token operator">></span> <span class="token punctuation">{</span>
+
+<span class="token punctuation">}</span></code></pre>
+<ul>
+<li>import 문 추가 </li>
+</ul>
+<pre class="language-javascript"><code class="language-javascript"><span class="token keyword module">import</span> org<span class="token punctuation">.</span><span class="token property-access">springframework</span><span class="token punctuation">.</span><span class="token property-access">data</span><span class="token punctuation">.</span><span class="token property-access">repository</span><span class="token punctuation">.</span><span class="token property-access"><span class="token maybe-class-name">CrudRepository</span></span><span class="token punctuation">;</span></code></pre>
+<h4 id="5-repository-패턴을-사용하여-product-엔터티의-기본-라이프-사이클-crud-를-실습하여-봅니다"><a href="#5-repository-%ED%8C%A8%ED%84%B4%EC%9D%84-%EC%82%AC%EC%9A%A9%ED%95%98%EC%97%AC-product-%EC%97%94%ED%84%B0%ED%8B%B0%EC%9D%98-%EA%B8%B0%EB%B3%B8-%EB%9D%BC%EC%9D%B4%ED%94%84-%EC%82%AC%EC%9D%B4%ED%81%B4-crud-%EB%A5%BC-%EC%8B%A4%EC%8A%B5%ED%95%98%EC%97%AC-%EB%B4%85%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>5. Repository 패턴을 사용하여 Product 엔터티의 기본 라이프 사이클 (CRUD) 를 실습하여 봅니다.</h4>
+<ul>
+<li>스프링 부트를 실행 하는 방법은 mvn spring-boot:run 입니다.</li>
+<li>메이븐 명령어로 spring-boot 라는 플러그인의 run 명령어를 실행 합니다.</li>
+<li>spring-boot 플러그인은 pom.xml 파일에 설정되어 있습니다.</li>
+</ul>
+<pre class="language-xml"><code class="language-xml">    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>build</span><span class="token punctuation">></span></span>
+		<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugins</span><span class="token punctuation">></span></span>
+			<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>plugin</span><span class="token punctuation">></span></span>
+				<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+				<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-boot-maven-plugin<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+			<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugin</span><span class="token punctuation">></span></span>
+		<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>plugins</span><span class="token punctuation">></span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>build</span><span class="token punctuation">></span></span></code></pre>
+<ul>
+<li>실행시 기본 포트인 8080 으로 실행됩니다.</li>
+<li>http 명령으로 localhost:8080 을 호출하여 봅니다.</li>
+</ul>
+<pre class="language-bash"><code class="language-bash">http localhost:8080
+http http://localhost:8080/products
+http POST localhost:8080/products <span class="token assign-left variable">name</span><span class="token operator">=</span><span class="token string">"TV"</span> <span class="token assign-left variable">stock</span><span class="token operator">=</span><span class="token number">10</span>
+http <span class="token string">"http://localhost:8080/products/1"</span>
+http PATCH <span class="token string">"http://localhost:8080/products/1"</span> <span class="token assign-left variable">stock</span><span class="token operator">=</span><span class="token number">20</span>
+http DELETE <span class="token string">"http://localhost:8080/products/1"</span>
+http <span class="token string">"http://localhost:8080/products/1"</span></code></pre>
+<ul>
+<li>파일 두개만 만들었지만 Aggregate 와 Command 가 생성 된 것을 확인 할 수 있습니다.</li>
+</ul>
+<h4 id="6-event-를-생성합니다"><a href="#6-event-%EB%A5%BC-%EC%83%9D%EC%84%B1%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>6. Event 를 생성합니다.</h4>
+<ul>
+<li>이벤트는 일어난 사실에 대한 결과이기 때문에 과거분사(PP, Past Participle) 형으로 작성 합니다.</li>
+<li>상품 정보가 변경 되었을 때 변경 사실을 알리는 ProductChanged 이벤트를 만들어 봅니다.</li>
+<li>ProductChanged 클레스를 생성하고, 변수를 설정합니다.</li>
+<li>이벤트는 다른 서비스에서 받아보는 정보입니다. 그렇기 때문에 자세하게 적어주어야 할 필요가 있습니다. json 으로 데이터를 보내기 때문에 eventType 이라는 변수를 만들고, 생성자에서 이벤트 이름을 적어 줍니다.</li>
+<li>세부 정보도 다른 서비스에서 명확히 이해하기 쉽도록 그냥 name 이 아닌 productName 처럼 구체적으로 작성 합니다.</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>demo</span><span class="token punctuation">;</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ProductChanged</span> <span class="token punctuation">{</span>
+    <span class="token class-name">String</span> eventType<span class="token punctuation">;</span>
+    <span class="token class-name">Long</span> productId<span class="token punctuation">;</span>
+    <span class="token class-name">String</span> productName<span class="token punctuation">;</span>
+    <span class="token keyword">int</span> productStock<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">ProductChanged</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+            <span class="token keyword">this</span><span class="token punctuation">.</span>eventType <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getSimpleName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token comment">// get/set 메서드</span>
+<span class="token punctuation">}</span></code></pre>
+<h4 id="7-생성된-event-를-발송합니다"><a href="#7-%EC%83%9D%EC%84%B1%EB%90%9C-event-%EB%A5%BC-%EB%B0%9C%EC%86%A1%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>7. 생성된 Event 를 발송합니다.</h4>
+<ul>
+<li>이벤트는 Aggregate 내의 상태 변화에 의해서 발생하기 때문에, 이벤트를 보내는 로직은 Entity의 lifecycle 에 작성하게 됩니다.</li>
+<li>Product.java 에 데이터가 입력되었을때의 Lifecycle 인 @PostPersist 어노테이션에 이벤트를 생성하여 값을 셋팅 합니다.</li>
+<li>ObjectMapper 를 사용하여 json 으로 변환 합니다.</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token annotation punctuation">@PostPersist</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eventPublish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        <span class="token class-name">ProductChanged</span> productChanged <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ProductChanged</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        productChanged<span class="token punctuation">.</span><span class="token function">setProductId</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        productChanged<span class="token punctuation">.</span><span class="token function">setProductName</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        productChanged<span class="token punctuation">.</span><span class="token function">setProductStock</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getStock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">ObjectMapper</span> objectMapper <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">String</span> json <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+        <span class="token keyword">try</span> <span class="token punctuation">{</span>
+            json <span class="token operator">=</span> objectMapper<span class="token punctuation">.</span><span class="token function">writeValueAsString</span><span class="token punctuation">(</span>productChanged<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JsonProcessingException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"JSON format exception"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>json<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<ul>
+<li>import 문 추가 </li>
+</ul>
+<pre class="language-text"><code class="language-text">import javax.persistence.PostPersist;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;</code></pre>
+<ul>
+<li>서비스를 재시작 후 Aggregate 에 데이터를 입력하여 정상적으로 json 이 생성되는지 확인 합니다.</li>
+<li>http POST localhost:8080/products name=“TV” stock=10</li>
+</ul>
+<pre class="language-text"><code class="language-text">{&quot;eventType&quot;:&quot;ProductChanged&quot;,&quot;productId&quot;:1,&quot;productName&quot;:&quot;TV&quot;,&quot;productStock&quot;:10}</code></pre>
+<h4 id="8-서비스에-카프카-연결"><a href="#8-%EC%84%9C%EB%B9%84%EC%8A%A4%EC%97%90-%EC%B9%B4%ED%94%84%EC%B9%B4-%EC%97%B0%EA%B2%B0" aria-hidden="true"><span class="icon icon-link"></span></a>8. 서비스에 카프카 연결</h4>
+<ul>
+<li>Spring Cloud Stream Application 모델
+<img src="https://user-images.githubusercontent.com/43136526/119310820-4354ea00-bcab-11eb-8309-7f8431ad1715.png" alt="image"></li>
+<li>Spring Cloud Streams Application에서 Kafka 바인더를 사용하기 위하여 다음 라이브러리를 pom.xml 에 추가합니다.</li>
+</ul>
+<pre class="language-xml"><code class="language-xml"><span class="token comment">&lt;!-- kafka streams --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.cloud<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-cloud-starter-stream-kafka<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.boot<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-boot-starter-actuator<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span></code></pre>
+<ul>
+<li>spring cloud 는 spring-boot 와 버전에 대한 종속성이 있습니다. 그리하여 각각의 spring-cloud 프로젝트 별로 버전을 직접 명시하지 않고, 종속성을 선언하는 를 사용하여야 합니다.</li>
+<li>아래와 같이 를 pom.xml 에 추가하여 줍니다.</li>
+</ul>
+<pre class="language-xml"><code class="language-xml"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencyManagement</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependencies</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dependency</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>groupId</span><span class="token punctuation">></span></span>org.springframework.cloud<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>groupId</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>artifactId</span><span class="token punctuation">></span></span>spring-cloud-dependencies<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>artifactId</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>${spring-cloud.version}<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>type</span><span class="token punctuation">></span></span>pom<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>type</span><span class="token punctuation">></span></span>
+                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>scope</span><span class="token punctuation">></span></span>import<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>scope</span><span class="token punctuation">></span></span>
+        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependency</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencies</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dependencyManagement</span><span class="token punctuation">></span></span></code></pre>
+<ul>
+<li>pom.xml 에서 ${} 로 시작하는 부분은 변수(properties) 처리를 하겠다는 의미입니다. 상단의 부분에 위에서 변수처리함 &#x3C;spring-cloud.version> 를 추가하여 줍니다.</li>
+<li>여기서 버전을 명시할때 주의할 점은 Spring-boot에 매핑되는 Spring-cloud 버전을 사용해야 합니다.</li>
+<li>매핑되는 버전 정보는 스프링 클라우드 Site에서 확인 할 수 있습니다.</li>
+<li><a href="https://spring.io/projects/spring-cloud" target="_blank" rel="noopener noreferrer">https://spring.io/projects/spring-cloud</a> 의 Release Trains 참고</li>
+<li>Spring-boot 2.3.1과 Spring Cloud Hoxton을 적용합니다. </li>
+</ul>
+<pre class="language-xml"><code class="language-xml"># pom.xml 8라인
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>version</span><span class="token punctuation">></span></span>2.3.1.RELEASE<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>version</span><span class="token punctuation">></span></span></code></pre>
+<pre class="language-xml"><code class="language-xml"># pom.xml 16~19라인
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>properties</span><span class="token punctuation">></span></span>
+		<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>java.version</span><span class="token punctuation">></span></span>11<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>java.version</span><span class="token punctuation">></span></span>
+		<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>spring-cloud.version</span><span class="token punctuation">></span></span>Hoxton.SR12<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>spring-cloud.version</span><span class="token punctuation">></span></span>
+	<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>properties</span><span class="token punctuation">></span></span></code></pre>
+<ul>
+<li>DemoApplication.java 파일에 스트림을 바인딩 합니다.</li>
+<li>@EnableBinding(Processor.class)</li>
+<li>streams 은 메세지의 흐름으로 input 메세지와 output 메세지가 존재합니다.</li>
+<li>Processor 방식은 input 과 output 을 모두 사용하는 방식입니다.</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>demo</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span></span><span class="token class-name">SpringApplication</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>boot<span class="token punctuation">.</span>autoconfigure<span class="token punctuation">.</span></span><span class="token class-name">SpringBootApplication</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>cloud<span class="token punctuation">.</span>stream<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">EnableBinding</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>cloud<span class="token punctuation">.</span>stream<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">StreamListener</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>cloud<span class="token punctuation">.</span>stream<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span></span><span class="token class-name">Processor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span></span><span class="token class-name">ApplicationContext</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Payload</span></span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@SpringBootApplication</span>
+<span class="token annotation punctuation">@EnableBinding</span><span class="token punctuation">(</span><span class="token class-name">Processor</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">DemoApplication</span> <span class="token punctuation">{</span>
+	<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token class-name">ApplicationContext</span> applicationContext<span class="token punctuation">;</span>
+	<span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		applicationContext <span class="token operator">=</span> <span class="token class-name">SpringApplication</span><span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token class-name">DemoApplication</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">,</span> args<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<ul>
+<li>stream 을 kafka 와 연결하기 위하여 application.yaml 파일에 아래 설정을 추가 합니다.</li>
+<li>kafka brokers로 localhost:9092 를 사용한다는 의미입니다. 카프카 설치시 기본 포트가 9092 입니다.</li>
+<li>bindings.input 과 bindings.output 은 기본 채널입니다. 만약 채널명을 변경 하고 싶으면 Processor 를 새로 만들어야 합니다.</li>
+<li><a href="https://github.com/event-storming/products/blob/master/src/main/java/com/example/template/config/kafka/KafkaProcessor.java" target="_blank" rel="noopener noreferrer">https://github.com/event-storming/products/blob/master/src/main/java/com/example/template/config/kafka/KafkaProcessor.java</a></li>
+<li>destination 은 목적지라는 뜻인데, kafka 에서는 topic 이름이 됩니다.</li>
+<li>즉, 해당 설정은 shop 이라는 토픽에 메세지를 주고 받겠다는 의미입니다.</li>
+<li>환경정보 파일인 resouces/applications.properties를 application.yml로 변경 후, 아래 내용을 추가합니다.</li>
+</ul>
+<pre class="language-yaml"><code class="language-yaml"><span class="token key atrule">spring</span><span class="token punctuation">:</span>
+  <span class="token key atrule">cloud</span><span class="token punctuation">:</span>
+    <span class="token key atrule">stream</span><span class="token punctuation">:</span>
+      <span class="token key atrule">kafka</span><span class="token punctuation">:</span>
+        <span class="token key atrule">binder</span><span class="token punctuation">:</span>
+          <span class="token key atrule">brokers</span><span class="token punctuation">:</span> localhost<span class="token punctuation">:</span><span class="token number">9092</span>
+      <span class="token key atrule">bindings</span><span class="token punctuation">:</span>
+        <span class="token key atrule">input</span><span class="token punctuation">:</span>
+          <span class="token key atrule">group</span><span class="token punctuation">:</span> product
+          <span class="token key atrule">destination</span><span class="token punctuation">:</span> shop
+          <span class="token key atrule">contentType</span><span class="token punctuation">:</span> application/json
+        <span class="token key atrule">output</span><span class="token punctuation">:</span>
+          <span class="token key atrule">destination</span><span class="token punctuation">:</span> shop
+          <span class="token key atrule">contentType</span><span class="token punctuation">:</span> application/json   </code></pre>
+<h4 id="9-이벤트를-kafka-에-발송"><a href="#9-%EC%9D%B4%EB%B2%A4%ED%8A%B8%EB%A5%BC-kafka-%EC%97%90-%EB%B0%9C%EC%86%A1" aria-hidden="true"><span class="icon icon-link"></span></a>9. 이벤트를 kafka 에 발송</h4>
+<ul>
+<li>7번에서 추가한  Product.java 리소스의 @PostPersist 라이프사이클을  스트림에 메세지를 발송하는 코드로 수정합니다.</li>
+<li>어그리게잇(Product.java) 코드 수정</li>
+<li>라이브러리 임포트</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>cloud<span class="token punctuation">.</span>stream<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span></span><span class="token class-name">Processor</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span></span><span class="token class-name">MessageChannel</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span></span><span class="token class-name">MessageHeaders</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span>support<span class="token punctuation">.</span></span><span class="token class-name">MessageBuilder</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>util<span class="token punctuation">.</span></span><span class="token class-name">MimeTypeUtils</span></span><span class="token punctuation">;</span></code></pre>
+<ul>
+<li>Spring 에서 Bean으로 등록되지 않은 객체에서 Bean 객체를 사용하기 위해 @Autowired 대신, 직접 applicationContext 에서 getBean으로 참조합니다.</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token annotation punctuation">@PostPersist</span>
+<span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">eventPublish</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+	<span class="token class-name">ProductChanged</span> productChanged <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ProductChanged</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	productChanged<span class="token punctuation">.</span><span class="token function">setProductId</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	productChanged<span class="token punctuation">.</span><span class="token function">setProductName</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	productChanged<span class="token punctuation">.</span><span class="token function">setProductStock</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">getStock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token class-name">ObjectMapper</span> objectMapper <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ObjectMapper</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token class-name">String</span> json <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+
+	<span class="token keyword">try</span> <span class="token punctuation">{</span>
+json <span class="token operator">=</span> objectMapper<span class="token punctuation">.</span><span class="token function">writeValueAsString</span><span class="token punctuation">(</span>productChanged<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">JsonProcessingException</span> e<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"JSON format exception"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+	<span class="token class-name">Processor</span> processor <span class="token operator">=</span> <span class="token class-name">DemoApplication</span><span class="token punctuation">.</span>applicationContext<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token class-name">Processor</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token class-name">MessageChannel</span> outputChannel <span class="token operator">=</span> processor<span class="token punctuation">.</span><span class="token function">output</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	outputChannel<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token class-name">MessageBuilder</span>
+<span class="token punctuation">.</span><span class="token function">withPayload</span><span class="token punctuation">(</span>json<span class="token punctuation">)</span>
+<span class="token punctuation">.</span><span class="token function">setHeader</span><span class="token punctuation">(</span><span class="token class-name">MessageHeaders</span><span class="token punctuation">.</span>CONTENT_TYPE<span class="token punctuation">,</span> <span class="token class-name">MimeTypeUtils</span><span class="token punctuation">.</span>APPLICATION_JSON<span class="token punctuation">)</span>
+<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<ul>
+<li>수정 후 서비스를 재시작한 다음 REST API로 상품 등록 시, 카프카에 이벤트 메시지가 도달하는지 확인 합니다.</li>
+<li>메시지는 Kafka Consumer로써 shop 토픽(topic) 모니터링으로 확인 가능합니다.</li>
+<li>카프카 토픽 모니터링</li>
+</ul>
+<pre class="language-sh"><code class="language-sh">/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic shop</code></pre>
+<ul>
+<li>이벤트 발행</li>
+</ul>
+<pre class="language-sh"><code class="language-sh">http POST localhost:8080/products name="TV" stock=10</code></pre>
+<h4 id="10-이벤트를-수신하는-policy-를-생성합니다"><a href="#10-%EC%9D%B4%EB%B2%A4%ED%8A%B8%EB%A5%BC-%EC%88%98%EC%8B%A0%ED%95%98%EB%8A%94-policy-%EB%A5%BC-%EC%83%9D%EC%84%B1%ED%95%A9%EB%8B%88%EB%8B%A4" aria-hidden="true"><span class="icon icon-link"></span></a>10. 이벤트를 수신하는 Policy 를 생성합니다.</h4>
+<ul>
+<li>Event에 대응되는 Policy(폴리시)는 다른 마이크로서비스(팀)에서 수신 합니다.
+즉, 상품 서비스에서 ProductChanged 이벤트가 발생하면 주문이나 배송 서비스에서 이를 수신 후 각 서비스에 맞는 Biz-Logic을 처리하지만, 편의상 Kafka로부터 메세지 수신만 확인합니다.</li>
+<li>PolicyHandler.java 를 생성하고하고 @StreamListener(Processor.INPUT) 를 추가하여 스트림을 수신합니다.</li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>example<span class="token punctuation">.</span>demo</span><span class="token punctuation">;</span>
+
+<span class="token annotation punctuation">@Service</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">PolicyHandler</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@StreamListener</span><span class="token punctuation">(</span><span class="token class-name">Processor</span><span class="token punctuation">.</span>INPUT<span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">onEventByString</span><span class="token punctuation">(</span><span class="token annotation punctuation">@Payload</span> <span class="token class-name">ProductChanged</span> productChanged<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>productChanged<span class="token punctuation">.</span><span class="token function">getEventType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>productChanged<span class="token punctuation">.</span><span class="token function">getProductName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>productChanged<span class="token punctuation">.</span><span class="token function">getProductStock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<ul>
+<li>import 문 추가 </li>
+</ul>
+<pre class="language-java"><code class="language-java"><span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>cloud<span class="token punctuation">.</span>stream<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">StreamListener</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span>handler<span class="token punctuation">.</span>annotation<span class="token punctuation">.</span></span><span class="token class-name">Payload</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>stereotype<span class="token punctuation">.</span></span><span class="token class-name">Service</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>cloud<span class="token punctuation">.</span>stream<span class="token punctuation">.</span>messaging<span class="token punctuation">.</span></span><span class="token class-name">Processor</span></span><span class="token punctuation">;</span></code></pre>
+<ul>
+<li>String 이 아닌 객체 자체를 받아도 StreamListener 에서 객체 변환을 하여 줍니다.</li>
+<li>위의 카프카에 데이터를 보내는 명령을 호출하여 메세지를 수신하는지 확인 합니다.</li>
+</ul>
+</div><div class="mt-8 pt-8 lg:mt-12 lg:pt-12 border-t border-ui-border"><div><div class="flex flex-col sm:flex-row justify-between items-center"><!----><!----></div></div></div></div></div></div></main></div><!----></div>
+    <script src="/assets/js/app.fc6ca2d6.js" defer></script><script src="/assets/js/page--src--templates--markdown-page-vue.337d2322.js" defer></script>
+  </body>
+</html>

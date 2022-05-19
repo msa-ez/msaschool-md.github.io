@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html data-html-server-rendered="true" lang="en" data-vue-meta="%7B%22lang%22:%7B%22ssr%22:%22en%22%7D%7D">
+  <head>
+    <title>프론트엔드 개발 - msaez</title><meta name="gridsome:hash" content="639846ab77f2d650b364be948c0c3d68be620b02"><meta data-vue-meta="ssr" charset="utf-8"><meta data-vue-meta="ssr" name="generator" content="Gridsome v0.7.23"><meta data-vue-meta="ssr" key="viewport" name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta data-vue-meta="ssr" key="format-detection" name="format-detection" content="telephone=no"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-argo-rollout-canary-istio/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-deploy-my-app/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-service-mesh-istio/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-anatomy-kubernetes/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-aws-setting/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-ingress-virtualhost/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-persistence-volume/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-autoscale/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-ingress/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-kubernetes/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-liveness/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-readiness/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/ops-utility/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/business/zero-based-cna/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/msa-logging/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/k8s-monitoring/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/istio-msa-telemetry/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/istio-resiliency-part1/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/istio-resiliency-part2/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/istio-traffic/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/gitops-argo-cd/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/end-to-end/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/ops-docker/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/oauth2/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/oauth2withkeycloak/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/kafka-manual-commit/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/kafka-retry-dlq/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/keycloak-oauth2-1/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/keycloak-oauth2-2/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/keycloak-oauth2-3/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/monolith2misvc/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/kafka-base/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/kafka-scaling/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/operations/azure/"><meta data-vue-meta="ssr" key="og:url" name="og:url" content="undefined/development/front-end/"><meta data-vue-meta="ssr" name="description" content="undefined"><meta data-vue-meta="ssr" key="og:title" name="og:title" content="프론트엔드 개발"><meta data-vue-meta="ssr" key="twitter:title" name="twitter:title" content="프론트엔드 개발"><meta data-vue-meta="ssr" key="og:description" name="og:description" content="undefined"><meta data-vue-meta="ssr" key="twitter:description" name="twitter:description" content="undefined"><meta data-vue-meta="ssr" key="og:type" name="og:type" content="website"><meta data-vue-meta="ssr" key="twitter:card" name="twitter:card" content="summary_large_image"><meta data-vue-meta="ssr" key="og:image" name="og:image" content="undefined/logo.jpg"><meta data-vue-meta="ssr" key="twitter:image" name="twitter:image" content="undefined/logo.jpg"><link data-vue-meta="ssr" rel="icon" href="data:,"><link data-vue-meta="ssr" rel="icon" type="image/png" sizes="16x16" href="/assets/static/favicon.ce0531f.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="icon" type="image/png" sizes="32x32" href="/assets/static/favicon.ac8d93a.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="icon" type="image/png" sizes="96x96" href="/assets/static/favicon.b9532cc.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="76x76" href="/assets/static/favicon.f22e9f3.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="152x152" href="/assets/static/favicon.62d22cb.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="120x120" href="/assets/static/favicon.1539b60.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="167x167" href="/assets/static/favicon.dc0cdc5.f0886199c685a75a52fccefb5e72c094.png"><link data-vue-meta="ssr" rel="apple-touch-icon" type="image/png" sizes="180x180" href="/assets/static/favicon.7b22250.f0886199c685a75a52fccefb5e72c094.png"><link rel="preload" href="/assets/css/0.styles.b9f2c2f4.css" as="style"><link rel="preload" href="/assets/js/app.fc6ca2d6.js" as="script"><link rel="preload" href="/assets/js/page--src--templates--markdown-page-vue.337d2322.js" as="script"><link rel="prefetch" href="/assets/js/page--src--pages--404-vue.fe9494d9.js"><link rel="prefetch" href="/assets/js/page--src--pages--index-vue.bc04380e.js"><link rel="prefetch" href="/assets/js/search.cdc1ffc3.js"><link rel="stylesheet" href="/assets/css/0.styles.b9f2c2f4.css"><noscript data-vue-meta="ssr"><style>.g-image--loading{display:none;}</style></noscript>
+  </head>
+  <body >
+    <div data-server-rendered="true" id="app" class="font-sans antialiased text-ui-typo bg-ui-background"><div class="flex flex-col justify-start min-h-screen"><header class="sticky top-0 z-10 w-full border-b bg-ui-background border-ui-border"><div class="py-2 border-t-2 border-ui-primary"><div class="container"><div class="flex items-center justify-between -mx-2 sm:-mx-4"><div class="flex flex-col items-center px-2 mr-auto sm:px-4 sm:flex-row"><a href="/" title="Home" class="flex items-center text-ui-primary active"><img src="data:image/svg+xml,%3csvg fill='none' viewBox='0 0 300 82' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3cdefs%3e%3cfilter id='__svg-blur-d11350692290831d900d696f65124740'%3e%3cfeGaussianBlur in='SourceGraphic' stdDeviation='40'/%3e%3c/filter%3e%3c/defs%3e%3cimage x='0' y='0' filter='url(%23__svg-blur-d11350692290831d900d696f65124740)' width='300' height='82' xlink:href='data:image/png%3bbase64%2ciVBORw0KGgoAAAANSUhEUgAAAEAAAAARCAYAAABtu6qMAAAACXBIWXMAAAsTAAALEwEAmpwYAAAI50lEQVRYw91XeVRU1xm/b6ioMWqr2CY5p8eTnJhUPU3aJF2OtolNc9KSGKuyLwKCLAMzyCLDMsOsLA4wwAz7NgsMzMCwD/sOBkXZVJZYIUoSFY11OW0a4kJfv3tn3ghtT/o/c8477y7fffd%2bv%2b/3/e43CMFvZvImivGrwk0Ue8KIssUdKC%2b5G%2bUkdaGi9H6kErahlb/J4Wtozfz%2b%2bc0jFOmtJ%2b2Y4wbk82Eh63/ZtRnGHVsNYyHfLT3%2bAe6f77u6NgAQh9eTd3xQjW2MpmnK%2btjh/kj/3EutVWM3Jnr%2bRvc2Xj6Ax9qrJ1hrAgBfxyKUFNXEOI44brriECfNNbaTZhaeGXgWI7z0bJjb2lN/ST5gnt6FbQfMUxR%2bl2UPoBxZF1VdOkK%2bkRZvJm%2bNchCV550h7dLMfpQlbKeU0k7UZpq07a2SdaLc5C7SDnPRokbjMCoq1ZK%2b3mBCRSUaqkRdjsYmLpIxnd6AGptaSbu%2bwYyqTQ3o9uJt0h8cGv5ePxubLWnc3NKODNV1qKOr99lkyFE1oXW4Rzk70qOOZh/VwVNOc1wMNIBxOyG4ZhtJkQDjb/wOlhLbFvMsyhS2277xwZ5UzBjSzhC02sZF3DrKHvlRTN/j/TzSBqBtY1E%2blaR93F1iYaVMDv31tm9wInjUSmfu3Xuwyjl6eXkle9HsZ39FV%2bc%2bt43NzVvaDx/%2bfdW6pW%2bXEOL5G8jHJSfrt0O0vw45oqGDj6ifBB0ue8RxqaQh%2bh54XhbZ8NtT3nV01LFKH9wPddaS9CiQ967raZreYvnku2h8%2bDpzENbkyMI6ZjOFoO2FmrKR53H7wK5ksuf02Fcbb1y/twG3YW8yFsXj25zNLyp7ESK2Cbdf3fM2KihWU7wEsR0Awrpz5y5raek7%2b6TUDLvo2EQ7VV4RWafIzqNi4kV2Ytlp1vDZ8wQQAJTFSxDZJQhlJEjLT5fX4xQnm/g5FttZI6Lkuhqx848xABznKjrURdvDHEYYVusBh7wJY4uGknPPMePyOPO%2bUBfNg7hAoz/u2yNfFt4kwqvi0xh/Q6Sx5Nw2YFYX1103Bc882PGxnTSi4XVYNx/mqp1VJLa9TNgSW0LOkp1TuDtBmNQLB74Mz9UUeSbnPykNju8VSlNXXU%2bJ4hS7lf0/f%2bJMefkFrWKPPEP5El%2bUPAbgvmIbPOVX9QakwXLQYTUGAN5ldMhRDR3tW/UrPB/hrT8W7VtZAFTNj/ZspsGhWMtKR4yofeDhsluw5u6tL%2b4TYBJDaz%2bOdG%2bmeQGG6AjvilJwctIiuHWvwHOC5LyrNgVAP8dx1w2Fe5bn4jGvwyJ7/E5IlHXE8iV91ojuUijzvHC7uEz3k0RJSrg0Jf2gLDXj97F88XxqeraHQJwcUK43brfavAg2nJS0rPcZ/1LTst6DsSi1Vv%2bCXKF0OBUnfAwg77EBAFE1cSHfceQxAzAT4HAqSz63bea6l3fGnTCmYpBCjmixLtyD1NnOrGe7aEZCnfT0qeNVxDmuR3kvx6Ua92NAPz4CZ%2bcjj%2bl1UT76g8wasOkXsE2OQk7tH2B/ApDjgXASQZHsdECcQPIZHLpUJD1N1uQWlO6MT5TO8kVJRhhvUGTnCiJj%2bA8g6k3Akr44gbS1orL65XiBdBbmq6C/AEAFJMszPWDdNNjpYexKRnbuhwDAojK3aO9KAGo5FgAehWABBOWHKO4g0ffSZ0H0GwGEgTCnSmyDAbjP8zc6MFcmOHgBom0C0PoSw2rdgSETwJohrodOiW3gNtgE86444pAG9X0tMzsAzIcQfSV%2bQpzU9wvlvT8mgnxCQkCob2zZJE1Od4fDj8Dhc8CpFGgPMGc%2bnZ79DuT1AqM3AMwFAM4MGkEUGNLDB4C5yBcmzQCb3K3MagM7PS9eNJelKvj5yhR4Ew70L6DxE66rgT7pWRFsEb7G3WxnzVLwUcwMDY2FEbMDwCB5/PYOATksvjZB7d3AuRa2k44Wcer8wNkmDABoxH6oLn%2bH7QShpj/C974GkKKCjpQt4rSCJx8AuAtn8GTOk56Vcwhy/C1rzn4MVP8KKC%2bG9zQR3mL1tjSFyjs2QTw1cfGyfWGJ9ocCUfJZSVKaHsZGibNCmQycHYD0GARQSMoCqyaFklQVMOBGpjL/DasIFjEimBXt2USDup9hDgKRrMPMAMefQuSf4qsR5q%2bpswc3WCxITYSA3sOSiPp94KgrsOEWjgiMGUEEeXy26S8AzHXI83GYW4gLrA4EOwVoQxazD9glxxyvyl8hcEEQ7TkQq3Gg9OeSJHkIZhpEsxEcG08UJw8DSHHAipbRscn1DU2tm0Dpu0HY3gGbBnB8DNZfTVMo3wWgfg1rLsH4GDCgq6BYsxf603mFZa%2bRzXgBRqKSEBUHoP5tuOb%2bZGXFB6HO5dh5rAtPLddiFQ1ls7s1bWyK22a6uKVBP7oOq/%2bdmw%2bJEJqNE5trtRdIu7txaiNowW6VtNPBmhJbes3TG/btlLD2bollXR790r5GfX4rnvvokBs5T0tb53Og/ruhEHJYqeJpmao3gb4/Jfu2d2/Fe96CYqizu2%2brTekVql/oKp5pVJlG7wBMeou5%2blrbu340Nj75rJJ1/GUGeecmde3Hbz67dh1Eep7rYiRFEdaFCLdafC124/n9O6VUUVofVHiD6LWNEf9VdYFA2toBh0pWlcxu7%2bXY%2brrcM6h1RWXI5%2brIO5B9ctXV5R/EZZWqy6n/V9V6%2bQat6oNIUsCEVfsHh0Xa2v0DQPZm/Shq0p4nRh01E8VQ4ibFBhi9sBBay%2bErkONzAMgIsOJV8mFv/aqP5qd2I23OEFJDWYzblrEeVCi3lBFZonYEak%2bl8ppJIYJtmBIY/0oUfagwzVKa7v9ZJHr6ZBnnOQL6UsrcQmrhiy8tkdTqsT5QWap8ytzagdS6SvTtP75BZ0dGka7CCOVtH8KlM7bB65jvw5VHpWfmsApLNOjS1Awq1VRQTGmMRgfnUHXhp5QFgMmQTtNk3FDHlc2Muq78U2TVBWILIKE19dOrBr%2bXYnuej7U5H3CwBKUntK4Jv/8Nl9Or%2bZJ%2b%2btwAAAAASUVORK5CYII=' /%3e%3c/svg%3e" width="300" data-src="/assets/static/msaschool_logo.6b65613.de89ab5f2636ecdd884e540e6ce8a652.png" data-srcset="/assets/static/msaschool_logo.6b65613.de89ab5f2636ecdd884e540e6ce8a652.png 300w" data-sizes="(max-width: 300px) 100vw, 300px" class="text-ui-primary g-image g-image--lazy g-image--loading"><noscript><img src="/assets/static/msaschool_logo.6b65613.de89ab5f2636ecdd884e540e6ce8a652.png" class="text-ui-primary g-image g-image--loaded" width="300"></noscript></a></div><div class="w-full px-2 sm:px-4 max-w-screen-xs"><!----></div><div class="flex items-center justify-end px-2 sm:px-4"><!----><!----><!----><div style="width:50px; height:50px; text-aling:center; line-height:50px; font-weight:700;"><a href="https://intro.msaez.io">English</a></div><button aria-label="Toggle Darkmode" title="Toggle Darkmode" class="ml-2 sm:ml-8"><svg xmlns="http://www.w3.org/2000/svg" width="1.5em" height="1.5em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-sun"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg></button></div></div></div></div></header><main class="container relative flex flex-wrap justify-start flex-1 w-full bg-ui-background"><!----><div class="w-full pb-24"><div class="flex flex-wrap items-start justify-start"><div><a href="http://www.msaez.io/" target="_blank" rel="noopener" class="flex items-center px-1 py-1 ml-auto text-1xl font-bold leading-none text-white border rounded-lg shadow-lg bg-ui-primary border-ui-primary transition-all duration-200 ease-out transform hover:shadow-xl hover:-translate-y-1" style="position:absolute;top:5px;">
+            실습하기
+            <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="ml-1 feather feather-arrow-right-circle"><circle cx="12" cy="12" r="10"></circle><polyline points="12 16 16 12 12 8"></polyline><line x1="8" y1="12" x2="16" y2="12"></line></svg></a></div><div class="order-1 w-full md:w-2/3"><div class="content"><h1 id="프론트엔드-개발"><a href="#%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C-%EA%B0%9C%EB%B0%9C" aria-hidden="true"><span class="icon icon-link"></span></a>프론트엔드 개발</h1>
+<h3 id="vuejs-프레임워크를-사용하기-위한-vue-유틸리티-명령어-설치"><a href="#vuejs-%ED%94%84%EB%A0%88%EC%9E%84%EC%9B%8C%ED%81%AC%EB%A5%BC-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0-%EC%9C%84%ED%95%9C-vue-%EC%9C%A0%ED%8B%B8%EB%A6%AC%ED%8B%B0-%EB%AA%85%EB%A0%B9%EC%96%B4-%EC%84%A4%EC%B9%98" aria-hidden="true"><span class="icon icon-link"></span></a>VueJS 프레임워크를 사용하기 위한 vue 유틸리티 명령어 설치</h3>
+<pre class="language-text"><code class="language-text">npm install -g @vue/cli</code></pre>
+<h3 id="애플리케이션-생성"><a href="#%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%EC%83%9D%EC%84%B1" aria-hidden="true"><span class="icon icon-link"></span></a>애플리케이션 생성</h3>
+<pre class="language-text"><code class="language-text">vue create front-end</code></pre>
+<blockquote>
+<p>옵션선택:  Vue2 선택,  패키지 매니저를 npm 으로 설정하는 것을 제외한 나머지 옵션은 모두 Default 선택을 선택함:
+Package Manager: Use NPM</p>
+</blockquote>
+<h3 id="생성된-애플리케이션-살펴보기"><a href="#%EC%83%9D%EC%84%B1%EB%90%9C-%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98-%EC%82%B4%ED%8E%B4%EB%B3%B4%EA%B8%B0" aria-hidden="true"><span class="icon icon-link"></span></a>생성된 애플리케이션 살펴보기</h3>
+<pre class="language-text"><code class="language-text">cd front-end
+ls</code></pre>
+<blockquote>
+<p>vuejs 파일(*.vue)들을 IDE 에서 읽기 쉽게 하기 위해 Extensions > "vuejs" 로 검색하면 플러그인을 설치할 수 있습니다.</p>
+</blockquote>
+<h3 id="vuetify-ui-component-설치"><a href="#vuetify-ui-component-%EC%84%A4%EC%B9%98" aria-hidden="true"><span class="icon icon-link"></span></a>Vuetify UI Component 설치</h3>
+<pre class="language-text"><code class="language-text">vue add vuetify</code></pre>
+<blockquote>
+<p>Default 옵션으로 설치. </p>
+</blockquote>
+<h3 id="애플리케이션의-빌드와-실행"><a href="#%EC%95%A0%ED%94%8C%EB%A6%AC%EC%BC%80%EC%9D%B4%EC%85%98%EC%9D%98-%EB%B9%8C%EB%93%9C%EC%99%80-%EC%8B%A4%ED%96%89" aria-hidden="true"><span class="icon icon-link"></span></a>애플리케이션의 빌드와 실행</h3>
+<pre class="language-text"><code class="language-text">npm install
+npm run serve</code></pre>
+<h3 id="브라우저에서-열기"><a href="#%EB%B8%8C%EB%9D%BC%EC%9A%B0%EC%A0%80%EC%97%90%EC%84%9C-%EC%97%B4%EA%B8%B0" aria-hidden="true"><span class="icon icon-link"></span></a>브라우저에서 열기</h3>
+<p>Labs > 포트열기 > 8080 (혹은 다른 포트번호)</p>
+<blockquote>
+<p>Invalid Host Header 오류를 제거하기 위하여 vue.config.js 에 devServer 블록을 추가:</p>
+</blockquote>
+<pre class="language-text"><code class="language-text">module.exports = {
+  transpileDependencies: [
+    &#39;vuetify&#39;
+  ],
+
+  devServer: {
+    allowedHosts: &quot;all&quot;,
+  }
+}</code></pre>
+<h3 id="상품목록을-만들기-위하여-card-컴포넌트를-사용"><a href="#%EC%83%81%ED%92%88%EB%AA%A9%EB%A1%9D%EC%9D%84-%EB%A7%8C%EB%93%A4%EA%B8%B0-%EC%9C%84%ED%95%98%EC%97%AC-card-%EC%BB%B4%ED%8F%AC%EB%84%8C%ED%8A%B8%EB%A5%BC-%EC%82%AC%EC%9A%A9" aria-hidden="true"><span class="icon icon-link"></span></a>상품목록을 만들기 위하여 Card 컴포넌트를 사용</h3>
+<ul>
+<li>card 컴포넌트 사용 설명 URL:  <a href="https://vuetifyjs.com/en/components/cards/" target="_blank" rel="noopener noreferrer">https://vuetifyjs.com/en/components/cards/</a></li>
+<li>샘플을 복사:</li>
+</ul>
+<pre class="language-text"><code class="language-text">  &lt;v-card
+    :loading=&quot;loading&quot;
+    class=&quot;mx-auto my-12&quot;
+    max-width=&quot;374&quot;
+  &gt;
+    &lt;template slot=&quot;progress&quot;&gt;
+      &lt;v-progress-linear
+        color=&quot;deep-purple&quot;
+        height=&quot;10&quot;
+        indeterminate
+      &gt;&lt;/v-progress-linear&gt;
+    &lt;/template&gt;
+
+    &lt;v-img
+      height=&quot;250&quot;
+      src=&quot;https://cdn.vuetifyjs.com/images/cards/cooking.png&quot;
+    &gt;&lt;/v-img&gt;
+
+    &lt;v-card-title&gt;Cafe Badilico&lt;/v-card-title&gt;
+
+    &lt;v-card-text&gt;
+      &lt;v-row
+        align=&quot;center&quot;
+        class=&quot;mx-0&quot;
+      &gt;
+        &lt;v-rating
+          :value=&quot;4.5&quot;
+          color=&quot;amber&quot;
+          dense
+          half-increments
+          readonly
+          size=&quot;14&quot;
+        &gt;&lt;/v-rating&gt;
+
+        &lt;div class=&quot;grey--text ml-4&quot;&gt;
+          4.5 (413)
+        &lt;/div&gt;
+      &lt;/v-row&gt;
+
+      &lt;div class=&quot;my-4 subtitle-1&quot;&gt;
+        $ • Italian, Cafe
+      &lt;/div&gt;
+
+      &lt;div&gt;Small plates, salads &amp; sandwiches - an intimate setting with 12 indoor seats plus patio seating.&lt;/div&gt;
+    &lt;/v-card-text&gt;
+
+    &lt;v-divider class=&quot;mx-4&quot;&gt;&lt;/v-divider&gt;
+
+    &lt;v-card-title&gt;Tonight&#39;s availability&lt;/v-card-title&gt;
+
+    &lt;v-card-text&gt;
+      &lt;v-chip-group
+        v-model=&quot;selection&quot;
+        active-class=&quot;deep-purple accent-4 white--text&quot;
+        column
+      &gt;
+        &lt;v-chip&gt;5:30PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;7:30PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;8:00PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;9:00PM&lt;/v-chip&gt;
+      &lt;/v-chip-group&gt;
+    &lt;/v-card-text&gt;
+
+    &lt;v-card-actions&gt;
+      &lt;v-btn
+        color=&quot;deep-purple lighten-2&quot;
+        text
+        @click=&quot;reserve&quot;
+      &gt;
+        Reserve
+      &lt;/v-btn&gt;
+    &lt;/v-card-actions&gt;
+  &lt;/v-card&gt;</code></pre>
+<ul>
+<li>App.vue 의 "HelloWorld" 태그를 복사한 내용으로 대체</li>
+<li>사용하지 않는 컴포넌트선언들을 주석처리하여 무력화:</li>
+</ul>
+<pre class="language-text"><code class="language-text">&lt;script&gt;
+//import HelloWorld from &#39;./components/HelloWorld&#39;;
+
+export default {
+  name: &#39;App&#39;,
+
+  components: {
+ //   HelloWorld,
+  },
+
+  data: () =&gt; ({
+    //
+  }),
+};
+&lt;/script&gt;</code></pre>
+<h3 id="상품목록을-위한-변수-선언"><a href="#%EC%83%81%ED%92%88%EB%AA%A9%EB%A1%9D%EC%9D%84-%EC%9C%84%ED%95%9C-%EB%B3%80%EC%88%98-%EC%84%A0%EC%96%B8" aria-hidden="true"><span class="icon icon-link"></span></a>상품목록을 위한 변수 선언</h3>
+<pre class="language-text"><code class="language-text">  data: () =&gt; ({
+    products: []
+  }),</code></pre>
+<h3 id="생성자에-상품-목록-얻어오는-로직-작성"><a href="#%EC%83%9D%EC%84%B1%EC%9E%90%EC%97%90-%EC%83%81%ED%92%88-%EB%AA%A9%EB%A1%9D-%EC%96%BB%EC%96%B4%EC%98%A4%EB%8A%94-%EB%A1%9C%EC%A7%81-%EC%9E%91%EC%84%B1" aria-hidden="true"><span class="icon icon-link"></span></a>생성자에 상품 목록 얻어오는 로직 작성</h3>
+<pre class="language-text"><code class="language-text">export default {
+  name: &#39;App&#39;,
+
+  components: {
+ //   HelloWorld,
+  },
+
+  data: () =&gt; ({
+    products: []
+  }),
+
+  async created() {
+      var temp = await axios.get(&#39;http://8081-labs--1247012378.kuberman.io/products&#39;)
+
+      console.log(temp.data._embedded.products)
+      this.products = temp.data._embedded.products;
+  }
+}</code></pre>
+<blockquote>
+<p>쇼핑몰 상품 정보 서비스를 호출하기 위해서 다음의 git 에서 코드를 다운받고 실행시켜야 합니다:</p>
+<pre class="language-text"><code class="language-text">git clone https://github.com/event-storming/monolith.git
+cd monolith
+mvn spring-boot:run</code></pre>
+<p>axios 라이브러리를 가져오기 위하여   다음 import 문장을 export default 상단에 추가:   </p>
+<pre class="language-text"><code class="language-text">const axios = require(&#39;axios&#39;).default;</code></pre>
+<p>그래도 라이브러리가 없다고 나오면 터미널에서 다음을 실행 (front-end 의 디렉토리에서 실행)</p>
+<pre class="language-text"><code class="language-text">npm install axios</code></pre>
+</blockquote>
+<h3 id="화면-요소와-데이터의-바인딩-mvvm"><a href="#%ED%99%94%EB%A9%B4-%EC%9A%94%EC%86%8C%EC%99%80-%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%9D%98-%EB%B0%94%EC%9D%B8%EB%94%A9-mvvm" aria-hidden="true"><span class="icon icon-link"></span></a>화면 요소와 데이터의 바인딩 (MVVM)</h3>
+<p>v-card 태그와 얻어온 product 데이터를 바인딩 합니다.</p>
+<pre class="language-text"><code class="language-text"> &lt;v-card v-for=&quot;(product, index) in products&quot; v-bind:key=&quot;index&quot; 
+ ...</code></pre>
+<blockquote>
+<p>화면에 아까 존재하던 카드가 사라졌나요? 그렇다면 서버에 아직 product 상품이 존재하지 않기 때문입니다.</p>
+</blockquote>
+<h3 id="상품-서비스-기동시키기"><a href="#%EC%83%81%ED%92%88-%EC%84%9C%EB%B9%84%EC%8A%A4-%EA%B8%B0%EB%8F%99%EC%8B%9C%ED%82%A4%EA%B8%B0" aria-hidden="true"><span class="icon icon-link"></span></a>상품 서비스 기동시키기</h3>
+<p>새 터미널을 열고 monolith2micsvc 폴더의 monolith 프로젝트에 진입하여 백엔드를 기동시킵니다:</p>
+<pre class="language-text"><code class="language-text">cd monolith2misvc/
+cd monolith
+mvn spring-boot:run</code></pre>
+<blockquote>
+<p>상품서비스의 외부접속 주소를 얻기 위하여 Labs>포트열기>8081 (모놀리스 프로젝트의 포트번호) 를 통하여 브라우저에서 외부 주소를 확인합니다. 확인한 외부주소를 복사하여 앞서의 ajax 코드에 반영해줍니다:</p>
+</blockquote>
+<pre class="language-text"><code class="language-text">var temp = await axios.get(&#39;http://8081-labs--1247012378.kuberman.io/products&#39;)</code></pre>
+<ul>
+<li>화면을 리프래시 하여 상품개수만큼 리스트가 들어오는 것을 확인합니다</li>
+</ul>
+<h3 id="상품-이름-표시하기"><a href="#%EC%83%81%ED%92%88-%EC%9D%B4%EB%A6%84-%ED%91%9C%EC%8B%9C%ED%95%98%EA%B8%B0" aria-hidden="true"><span class="icon icon-link"></span></a>상품 이름 표시하기</h3>
+<p>상품이름을 어떻게 출력할 수 있을까요? vuejs 에서는 템플릿 html 내용에 {{변수명}} 를 사용하여 변수내용을 해당 위치에 표시할 수 있습니다.</p>
+<pre class="language-text"><code class="language-text">    &lt;v-card-title&gt;{{product.name}}&lt;/v-card-title&gt;</code></pre>
+<h3 id="주문-목록으로-전환하기"><a href="#%EC%A3%BC%EB%AC%B8-%EB%AA%A9%EB%A1%9D%EC%9C%BC%EB%A1%9C-%EC%A0%84%ED%99%98%ED%95%98%EA%B8%B0" aria-hidden="true"><span class="icon icon-link"></span></a>주문 목록으로 전환하기</h3>
+<p>상품목록 대신 주문 목록을 표시하도록 전환해보겠습니다. 주문정보를 통해서 어떤 상품을 주문했는지와, 배송상태를 얻어와 하나의 카드에 같이 출력하도록 Lazy Loading 방식으로 UI 에서 각각의 다른 마이크로서비스에서의 데이터를 통합할 수 있습니다.</p>
+<pre class="language-text"><code class="language-text">  data: () =&gt; ({
+    orders: []
+  }),
+
+async created() {
+      var temp = await axios.get(&#39;http://8081-labs--1247012378.kuberman.io/orders&#39;)
+
+      console.log(temp.data._embedded.orders)
+      this.orders = temp.data._embedded.orders;
+
+      this.orders.forEach(async order=&gt;{
+          var productData = await axios.get(&#39;http://8081-labs--1247012378.kuberman.io/products/&#39; + order.productId)
+
+          order.product = productData.data;
+
+          order.__ob__.dep.notify()
+      })
+  }</code></pre>
+<p>코드는 얻어온 주문의 목록에서 각 주문의 상품데이터를 다시 fetch 하여 객체에 담습니다. 주문정보에 상품정보가 보완이 되면, 그 때에 <strong>ob</strong>.notify() 에 의하여 객체의 변화가 MVVM 체계에 의하여 템플릿에 전달되어 변경된 주문 정보를 업데이트 하게 됩니다. </p>
+<p>따라서 템플릿 부분도 아래와 같이 변경합니다:</p>
+<pre class="language-text"><code class="language-text">&lt;v-card v-for=&quot;(order, index) in orders&quot; v-bind:key=&quot;index&quot;
+    :loading=&quot;loading&quot;
+    class=&quot;mx-auto my-12&quot;
+    max-width=&quot;374&quot;
+  &gt;
+...
+
+    &lt;v-card-title&gt;      
+        &lt;v-progress-linear
+            v-if=&quot;!order.product&quot;
+        color=&quot;deep-purple&quot;
+        height=&quot;10&quot;
+        indeterminate
+      &gt;&lt;/v-progress-linear&gt;
+      &lt;div v-else&gt;
+        {{order.product.name}}
+      &lt;/div&gt;
+    &lt;/v-card-title &gt;</code></pre>
+<p>v-if 를 통하여 order.product 의 정보가 로딩되는 중일때는 progress bar 를 표시하고, 주문정보가 채워질때 비로소 상품이름을 표시함으로서 각 마이크로서비스의 호출결과가 도달하지 않더라도 주문의 기본 정보는 미리 표시해 둘 수 있습니다.</p>
+<h3 id="확장-실험"><a href="#%ED%99%95%EC%9E%A5-%EC%8B%A4%ED%97%98" aria-hidden="true"><span class="icon icon-link"></span></a>확장 실험</h3>
+<p>해당 주문에 대한 배송상태 정보도 같이 표시해보세요.</p>
+<h3 id="order-를-위한-vue-component-를-분리하시오"><a href="#order-%EB%A5%BC-%EC%9C%84%ED%95%9C-vue-component-%EB%A5%BC-%EB%B6%84%EB%A6%AC%ED%95%98%EC%8B%9C%EC%98%A4" aria-hidden="true"><span class="icon icon-link"></span></a>Order 를 위한 Vue Component 를 분리하시오</h3>
+<p>VueJS 는 도메인 특화된 html 태그를 만들 수 있습니다. 이것은 유비쿼터스 랭귀지를 유지하여 비즈니스 피플과 개발자간의 커뮤니케이션을 유지하는 효과와 동시에 향후 컴포넌트의 재사용성과 간섭의 분리효과도 같이 높힐 수 있습니다.  주문에 대한 화면과 내부 정보를 채우는 로직을 "ShoppingOrder" 라고 하는 Vue Component 로 분리하여 html 태그로 간편하게 호출하여 어디서든 활용할 수 있도록 만들어 보겠습니다.</p>
+<p>먼저, 우리는 기존의 v-card 부분을 이렇게 변경하고 싶습니다:</p>
+<pre class="language-text"><code class="language-text">          &lt;shopping-order :order=&quot;order&quot; v-for=&quot;(order, index) in orders&quot; v-bind:key=&quot;index&quot;/&gt;</code></pre>
+<blockquote>
+<p>:order="order" 는 order 라는 컴포넌트에 주문한 건의 데이터를 전달 한다는 컴포넌트간 데이터 바인딩입니다. ":"이 들어가면 뒤에 따르는 값은 문자열이 아닌 실행세션 내의 접근가능한 변수 참조가 됩니다.</p>
+</blockquote>
+<p>그렇게 하기 위하여 기존의 v-card 의 템플릿영역과 관련된 로직의 덩어리들을 Order.vue 라고 하는 컴포넌트를 만들어서 사용하고 싶습니다. 기존에 HelloWorld.vue 라고 하는 샘플 컴포넌트를 참고하여 다음과 같이 ShoppingOrder.vue 를 만들어 components 폴더아래 위치합니다 (혹은 HelloWorld.vue 파일명을 변경해서 바로 작성해도 좋겠네요):</p>
+<pre class="language-text"><code class="language-text">&lt;template&gt;
+  &lt;v-card 
+    :loading=&quot;loading&quot;
+    class=&quot;mx-auto my-12&quot;
+    max-width=&quot;374&quot;
+  &gt;
+    &lt;template slot=&quot;progress&quot;&gt;
+      &lt;v-progress-linear
+        color=&quot;deep-purple&quot;
+        height=&quot;10&quot;
+        indeterminate
+      &gt;&lt;/v-progress-linear&gt;
+    &lt;/template&gt;
+
+    &lt;v-img
+      height=&quot;250&quot;
+      src=&quot;https://cdn.vuetifyjs.com/images/cards/cooking.png&quot;
+    &gt;&lt;/v-img&gt;
+
+    &lt;v-card-title&gt;      
+        &lt;v-progress-linear
+            v-if=&quot;!order.product&quot;
+        color=&quot;deep-purple&quot;
+        height=&quot;10&quot;
+        indeterminate
+      &gt;&lt;/v-progress-linear&gt;
+      &lt;div v-else&gt;
+        {{order.product.name}}
+      &lt;/div&gt;
+    &lt;/v-card-title &gt;
+
+    &lt;v-card-text &gt;
+      &lt;v-row
+        align=&quot;center&quot;
+        class=&quot;mx-0&quot;
+      &gt;
+        &lt;v-rating
+          :value=&quot;4.5&quot;
+          color=&quot;amber&quot;
+          dense
+          half-increments
+          readonly
+          size=&quot;14&quot;
+        &gt;&lt;/v-rating&gt;
+
+        &lt;div class=&quot;grey--text ml-4&quot;&gt;
+          4.5 (413)
+        &lt;/div&gt;
+      &lt;/v-row&gt;
+
+      &lt;div class=&quot;my-4 subtitle-1&quot;&gt;
+        $ • Italian, Cafe
+      &lt;/div&gt;
+
+      &lt;div&gt;Small plates, salads &amp; sandwiches - an intimate setting with 12 indoor seats plus patio seating.&lt;/div&gt;
+    &lt;/v-card-text&gt;
+
+    &lt;v-divider class=&quot;mx-4&quot;&gt;&lt;/v-divider&gt;
+
+    &lt;v-card-title&gt;Tonight&#39;s availability&lt;/v-card-title&gt;
+
+    &lt;v-card-text&gt;
+      &lt;v-chip-group
+        v-model=&quot;selection&quot;
+        active-class=&quot;deep-purple accent-4 white--text&quot;
+        column
+      &gt;
+        &lt;v-chip&gt;5:30PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;7:30PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;8:00PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;9:00PM&lt;/v-chip&gt;
+      &lt;/v-chip-group&gt;
+    &lt;/v-card-text&gt;
+
+    &lt;v-card-actions&gt;
+      &lt;v-btn
+        color=&quot;deep-purple lighten-2&quot;
+        text
+        @click=&quot;reserve&quot;
+      &gt;
+        
+      &lt;/v-btn&gt;
+    &lt;/v-card-actions&gt;
+  &lt;/v-card&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+  export default {
+    name: &#39;ShoppingOrder&#39;,
+
+    props: {
+        order: Object
+    },
+
+    data: () =&gt; ({
+    }),
+  }
+&lt;/script&gt;</code></pre>
+<p>여기서 주목할 점은 props 부분입니다. 외부에서 이 컴포넌트를 사용할때 props 에서 정의된 attribute 를 통해서 inbound 로 받아올 값을 얻어올 수 있습니다. 템플릿은 기존의 코드 그대로를 옮겨왔습니다.</p>
+<p>이 컴포넌트를 이용할 수 있도록 하려면 앞에서 주석처리했던 import 절과 component 목록에 Order 를 추가해주어야 합니다:</p>
+<pre class="language-text"><code class="language-text">&lt;script&gt;
+
+import ShoppingOrder from &#39;./components/ShoppingOrder&#39;
+...
+
+export default {
+  name: &#39;App&#39;,
+
+  components: {
+      ShoppingOrder
+  },
+	
+	...
+}</code></pre>
+<p>이렇게 변경한 후 브라우저를 리프래시하여 기존의 동작과 동일하게 동작하는지 확인해 봅니다. </p>
+<p>보시다시피, 상품정보를 읽어들여오지 못합니다. 이것은 한번 넘겨줄때의 order 값이 다른 컴포넌트에 전달될때는 해당 값의 복사본으로 전달되기 때문에 더이상 App.vue 에서 넘겨준 orders 각자의 값의 변경이 Order 컴포넌트 내부에는 영향을 줄 수 없기 때문에 발생한 문제입니다. </p>
+<p>다르게 생각하면, 이제부터는 Order.vue 에서 자신의 주문정보내부의 세부정보를 채우도록 하는 로직을 가져오는 것이 더 간섭과 Order.vue 파일을 관리할 주문팀의 자치성을 높히는 방향이 되므로, Order.vue 에 상품정보를 추가하는 로직을 옮겨오도록 하겠습니다.</p>
+<p>기존 App.vue 에 있던 상품정보를 로딩하는 for loop 를 잘라내어 Order.vue 의  생성자 (created 메서드) 로 옮깁니다:</p>
+<p>App.vue</p>
+<pre class="language-text"><code class="language-text"> async created() {
+      var temp = await axios.get(&#39;http://8081-labs--1247012378.kuberman.io/orders&#39;)
+
+      console.log(temp.data._embedded.orders)
+      this.orders = temp.data._embedded.orders;
+
+      [이 부분이 잘라낼 부분]
+			
+  }</code></pre>
+<p>Order.vue</p>
+<pre class="language-text"><code class="language-text">    async created(){
+
+        var productData = await axios.get(&#39;http://8081-labs--1247012378.kuberman.io/products/&#39; + this.order.productId)
+
+        this.order.product = productData.data;
+
+        this.order.__ob__.dep.notify()
+
+    }</code></pre>
+<p>Order.vue 에서는 for loop 가 더이상 필요 없어집니다. 각자의 Order Component 에서 created 는 매번 호출 되기 때문이죠. </p>
+<p>그리고 기존에 그냥 "order" 로 접근했던 코드는 자신의 객체의 멤버 프로퍼티를 확실하게 참조하도록 "this.order"로 모두 변경해줍니다.</p>
+<p>자, 이제 리프래시해서 기존 동작과 동일하게 동작됨을 확인합니다. </p>
+<p>이렇게 각 도메인별 컴포넌트를 분리하면 팀별 자율성을 높히면서 간섭없이 큰 프론트엔드를 관리할 수 있습니다. </p>
+<h4 id="ordervue-의-완성파일"><a href="#ordervue-%EC%9D%98-%EC%99%84%EC%84%B1%ED%8C%8C%EC%9D%BC" aria-hidden="true"><span class="icon icon-link"></span></a>Order.vue 의 완성파일</h4>
+<p>vue compiler 의 오류검증이 강화됨에 따라 props 의 값을 직접 변경하는 것이 불가능해졌기 때문에 초기값만을 복사한 후, 세부 값을 변경하는 코드로 변경됨:</p>
+<pre class="language-text"><code class="language-text">&lt;template&gt;
+  &lt;v-card 
+    :loading=&quot;loading&quot;
+    class=&quot;mx-auto my-12&quot;
+    max-width=&quot;374&quot;
+  &gt;
+    &lt;template slot=&quot;progress&quot;&gt;
+      &lt;v-progress-linear
+        color=&quot;deep-purple&quot;
+        height=&quot;10&quot;
+        indeterminate
+      &gt;&lt;/v-progress-linear&gt;
+    &lt;/template&gt;
+
+    &lt;v-img
+      height=&quot;250&quot;
+      src=&quot;https://cdn.vuetifyjs.com/images/cards/cooking.png&quot;
+    &gt;&lt;/v-img&gt;
+
+    &lt;v-card-title&gt;      
+        &lt;v-progress-linear
+            v-if=&quot;!innerOrder.product&quot;
+        color=&quot;deep-purple&quot;
+        height=&quot;10&quot;
+        indeterminate
+      &gt;&lt;/v-progress-linear&gt;
+      &lt;div v-else&gt;
+        {{innerOrder.product.name}}
+      &lt;/div&gt;
+    &lt;/v-card-title &gt;
+
+    &lt;v-card-text &gt;
+      &lt;v-row
+        align=&quot;center&quot;
+        class=&quot;mx-0&quot;
+      &gt;
+        &lt;v-rating
+          :value=&quot;4.5&quot;
+          color=&quot;amber&quot;
+          dense
+          half-increments
+          readonly
+          size=&quot;14&quot;
+        &gt;&lt;/v-rating&gt;
+
+        &lt;div class=&quot;grey--text ml-4&quot;&gt;
+          4.5 (413)
+        &lt;/div&gt;
+      &lt;/v-row&gt;
+
+      &lt;div class=&quot;my-4 subtitle-1&quot;&gt;
+        $ • Italian, Cafe
+      &lt;/div&gt;
+
+      &lt;div&gt;Small plates, salads &amp; sandwiches - an intimate setting with 12 indoor seats plus patio seating.&lt;/div&gt;
+    &lt;/v-card-text&gt;
+
+    &lt;v-divider class=&quot;mx-4&quot;&gt;&lt;/v-divider&gt;
+
+    &lt;v-card-title&gt;Tonight&#39;s availability&lt;/v-card-title&gt;
+
+    &lt;v-card-text&gt;
+      &lt;v-chip-group
+        v-model=&quot;selection&quot;
+        active-class=&quot;deep-purple accent-4 white--text&quot;
+        column
+      &gt;
+        &lt;v-chip&gt;5:30PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;7:30PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;8:00PM&lt;/v-chip&gt;
+
+        &lt;v-chip&gt;9:00PM&lt;/v-chip&gt;
+      &lt;/v-chip-group&gt;
+    &lt;/v-card-text&gt;
+
+    &lt;v-card-actions&gt;
+      &lt;v-btn
+        color=&quot;deep-purple lighten-2&quot;
+        text
+        @click=&quot;reserve&quot;
+      &gt;
+        
+      &lt;/v-btn&gt;
+    &lt;/v-card-actions&gt;
+  &lt;/v-card&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+  const axios = require(&#39;axios&#39;).default;
+
+  export default {
+    name: &#39;ShoppingOrder&#39;,
+
+    props: {
+        order: Object
+    },
+
+    data: () =&gt; ({
+        innerOrder: Object
+    }),
+
+    async created(){
+
+        this.innerOrder = this.order;
+         
+        var productData = await axios.get(&#39;https://8088-labs--1471950141.kuberez.io/products/&#39; + this.order.productId)
+
+console.log(productData);
+        this.innerOrder.product = productData.data;
+
+        this.innerOrder.__ob__.dep.notify()
+    
+    }
+  }
+&lt;/script&gt;</code></pre>
+<h3 id="마이크로-프론트엔드"><a href="#%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C-%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C" aria-hidden="true"><span class="icon icon-link"></span></a>마이크로 프론트엔드</h3>
+<p>이렇게 잘 만들어진 VueJS 컴포넌트구조가 있다하더라도 프론트엔드 컴포넌트들은 빌드를 통하여 한번에 반영되어야 하므로 실행중의 커플링은 여전히 존재하며, 각 팀이 만약 다른 프레임워크를 혼용하여 사용하길 선호한다면 (예를 들어 React.js 등) 여러분께서는 "마이크로프론트엔드"를 검토해볼 수 있습니다.  마이크로 프론트엔드는 다음과 같은 장점을 제공해 줍니다:</p>
+<ol>
+<li>팀간 분리된 컴포넌트 기반 개발과 통합</li>
+<li>팀간 배포 독립성</li>
+<li>팀간 기술 독립성 (다종의 UI-framework 혼합)</li>
+<li>장애 격리 (하나의 컴포넌트내의 자바스크립트 엔진이 죽어도 다른 컴포넌트가 영향 안받아야)</li>
+<li>이벤트 채널을 통한 컴포넌트간 연동 </li>
+</ol>
+<p>마이크로 프론트엔드를 적용해보고 싶다면 다음의 링크들을 참고하세요:</p>
+<ul>
+<li><a href="https://www.martinfowler.com/articles/micro-frontends.html" target="_blank" rel="noopener noreferrer">https://www.martinfowler.com/articles/micro-frontends.html</a></li>
+<li><a href="https://micro-frontends.org/" target="_blank" rel="noopener noreferrer">https://micro-frontends.org/</a></li>
+<li><a href="https://github.com/jinyoung/micro-frontends-with-web-components" target="_blank" rel="noopener noreferrer">https://github.com/jinyoung/micro-frontends-with-web-components</a></li>
+<li><a href="https://medium.com/javascript-in-plain-english/create-micro-frontends-using-web-components-with-support-for-angular-and-react-2d6db18f557a" target="_blank" rel="noopener noreferrer">https://medium.com/javascript-in-plain-english/create-micro-frontends-using-web-components-with-support-for-angular-and-react-2d6db18f557a</a></li>
+</ul>
+<h4 id="마이크로-프론트엔드-실습하기-위한-기본-코드-다운로드"><a href="#%EB%A7%88%EC%9D%B4%ED%81%AC%EB%A1%9C-%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C-%EC%8B%A4%EC%8A%B5%ED%95%98%EA%B8%B0-%EC%9C%84%ED%95%9C-%EA%B8%B0%EB%B3%B8-%EC%BD%94%EB%93%9C-%EB%8B%A4%EC%9A%B4%EB%A1%9C%EB%93%9C" aria-hidden="true"><span class="icon icon-link"></span></a>마이크로 프론트엔드 실습하기 위한 기본 코드 다운로드</h4>
+<pre class="language-text"><code class="language-text"></code></pre>
+<h4 id="포트넘버-수정"><a href="#%ED%8F%AC%ED%8A%B8%EB%84%98%EB%B2%84-%EC%88%98%EC%A0%95" aria-hidden="true"><span class="icon icon-link"></span></a>포트넘버 수정</h4>
+<p>micro-fe-ng/package.json 을 아래와 같이 수정:</p>
+<pre class="language-text"><code class="language-text">    &quot;start&quot;: &quot;npm run build &amp;&amp; serve -l 5001 dist/micro-fe-ng&quot;,</code></pre>
+<p>--></p>
+<pre class="language-text"><code class="language-text">    &quot;start&quot;: &quot;npm run build &amp;&amp; serve -l 8081 dist/micro-fe-ng&quot;,</code></pre>
+<p>나머지 micro-fe-react, micro-fe-vue, micro-fe-wrapper 의 package.json 내의 포트넘버를 아래와 같이 변경:</p>
+<pre class="language-text"><code class="language-text">5002 -&gt; 8082
+5003 -&gt; 8083
+5000 -&gt; 8080</code></pre>
+<p>각 프로젝트를 Open in Terminal 을 통해 별도 터미널을 열고 </p>
+<pre class="language-text"><code class="language-text">npm i
+npm start</code></pre>
+<p>마지막으로, micro-fe-wrapper/index.html 을 다음과 같이 수정:</p>
+<pre class="language-text"><code class="language-text">  &lt;script src=&quot;https://8081-labs--1471950141.kuberez.io/main.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://8082-labs--1471950141.kuberez.io/main.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://8083-labs--1471950141.kuberez.io/order-form.js&quot;&gt;&lt;/script&gt;</code></pre>
+<p>Labs> 포트열기> 8080</p>
+</div><div class="mt-8 pt-8 lg:mt-12 lg:pt-12 border-t border-ui-border"><div><div class="flex flex-col sm:flex-row justify-between items-center"><!----><!----></div></div></div></div></div></div></main></div><!----></div>
+    <script src="/assets/js/app.fc6ca2d6.js" defer></script><script src="/assets/js/page--src--templates--markdown-page-vue.337d2322.js" defer></script>
+  </body>
+</html>
