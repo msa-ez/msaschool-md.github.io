@@ -40,7 +40,7 @@
         <MenuIcon v-else />
       </button>
     </div>
-    <Footer></Footer>
+    <!-- <Footer></Footer> -->
   </div>
 </template>
 

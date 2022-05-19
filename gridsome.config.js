@@ -10,7 +10,7 @@ module.exports = {
     favicon: './src/assets/favicon.png',
     touchicon: './src/assets/favicon.png'
   },
-  siteUrl: (process.env.SITE_URL ? process.env.SITE_URL : 'https://msaschool-md.github.io'),
+  siteUrl: (process.env.SITE_URL ? process.env.SITE_URL : 'http://instruction.msaschool.io'),
   settings: {
     web: process.env.URL_WEB || false,
     twitter: process.env.URL_TWITTER || false,
@@ -28,7 +28,6 @@ module.exports = {
             title: 'Biz',
             items:[
               '/business/',
-              '/business/design-event/',
               '/business/eventstorming-fooddelivery/',
               '/business/ddd-google-drive/',
               '/business/collaborative-eventstorming/',
