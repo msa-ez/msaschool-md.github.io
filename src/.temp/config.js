@@ -2,7 +2,7 @@ export default {
   "trailingSlash": true,
   "pathPrefix": "",
   "titleTemplate": "%s - msaez",
-  "siteUrl": "instruction.msaschool.io",
+  "siteUrl": "https://msaschool-md.github.io",
   "version": "0.7.23",
   "catchLinks": true
 }

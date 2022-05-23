@@ -2,19 +2,28 @@
   <div
     ref="sidebar"
     v-if="showSidebar"
-    class="px-4 pt-8 lg:pt-12"
+    class="pt-6 lg:pt-10"
   >
+    <div class="py-3 px-4 mb-4 border-ui-border"
+      :class="{ 'border-b': index < sidebar.sections.length -1 }">
+      <g-link
+        to="http://www.msaschool.io/operation/introduction/"
+        style="font-weight: 900; font-size: 17px;"
+      >
+      돌아가기
+      </g-link>
+    </div>
     <div
       v-for="(section, index) in sidebar.sections"
       :key="section.title"
-      class="pb-4 mb-4 border-ui-border"
+      class="pb-4 px-4 mb-4 border-ui-border"
       :class="{ 'border-b': index < sidebar.sections.length -1 }"
     >
-      <h3 class="pt-0 mt-0 mb-1 text-sm tracking-tight uppercase border-none">
+      <h3 class="pt-0 mt-0 mb-1 text-lg tracking-tight uppercase border-none">
         {{ section.title }}
       </h3>
 
-      <ul class="max-w-full pl-2 mb-0">
+      <ul class="max-w-full px-2 mb-0">
         <li
           v-for="page in findPages(section.items)"
           :id="page.path"
@@ -24,15 +33,9 @@
         >
           <g-link
             :to="`${page.path}`"
-            class="flex items-center py-1 font-semibold"
+            class="flex ml-4 items-center py-1 font-semibold"
           >
-           <span
-              class="absolute w-2 h-2 -ml-3 rounded-full opacity-0 bg-ui-primary transition transform scale-0 origin-center"
-              :class="{
-                'opacity-100 scale-100': currentPage.path === page.path
-              }"
-            ></span>
-            {{ page.title }}
+            {{ page.title }} 
           </g-link>
         </li>
       </ul>

@@ -1,7 +1,7 @@
 <template>
   <Layout>
       <div class="flex flex-wrap items-start justify-start">
-        <div>
+        <!-- <div>
             <g-link
               to="http://www.msaez.io/"
               style="position:absolute; top:5px;"
@@ -10,18 +10,10 @@
               실습하기
               <ArrowRightCircleIcon class="ml-1" size="1x" />
             </g-link>
-          </div>
+          </div> -->
 
-        <!-- <div class="order-2 w-full md:w-1/3 sm:pl-4 md:pl-6 lg:pl-8 sticky" style="top: 4rem">
-          <OnThisPage />
-        </div> -->
-
-        <div class="order-1 w-full md:w-2/3">
+        <div class="order-1 w-full" style="width:96%; margin-right: 2%; margin-top:-2%;">
           <div class="content" v-html="$page.markdownPage.content" />
-
-          <div class="mt-8 pt-8 lg:mt-12 lg:pt-12 border-t border-ui-border">
-            <NextPrevLinks />
-          </div>
         </div>
 
       </div>

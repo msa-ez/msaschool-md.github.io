@@ -1,63 +1,85 @@
 <template>
-  <div class="py-2 border-t-2 border-ui-primary">
-    <div class="container">
+    <!--    <div class="py-2 border-t-2 border-ui-primary" style="background-color: #1e88e5;">-->
+    <div class="py-2 border-t-2 border-ui-primary">
+        <!--        <div class="container">-->
+        <div>
 
-      <div class="flex items-center justify-between -mx-2 sm:-mx-4">
-        <div class="flex flex-col items-center px-2 mr-auto sm:px-4 sm:flex-row">
-          <g-link
-            to="/"
-            class="flex items-center text-ui-primary"
-            title="Home"
-          >
-            <g-image src = "~/img/msaschool_logo.png" width="300" class="text-ui-primary" />
-          </g-link>
+            <div class="flex item-center" style="justify-content:space-between;">
 
-          <!-- <div v-if="settings.nav.links.length > 0" class="hidden ml-2 mr-5 sm:block sm:ml-8">
-            <g-link
-              v-for="link in settings.nav.links"
-              :key="link.path"
-              :to="link.path"
-              class="block p-1 font-medium nav-link text-ui-typo hover:text-ui-primary"
-            >
-              {{ link.title }}
-            </g-link>
-          </div> -->
+                <!-- 사이드바 버튼 -->
+                <!--                <div style="max-width: 3%; z-index: 999;" >-->
+                <!--                    <button class="p-3 text-black rounded-full "-->
+                <!--                            @click="sidebarClicked()">-->
+                <!--                        <MenuIcon size="20" />-->
+                <!--                    </button>-->
+                <!--                </div>-->
+
+
+                <div class="flex flex-col items-center sm:flex-row" style="margin-left:5%; place-self:center;">
+                    <!--                <div class="flex flex-col items-center px-3  mr-auto  sm:flex-row" style="margin-left:5%;">-->
+                    <g-link
+                            to="http://www.msaschool.io/operation/introduction/"
+                            title="Home"
+                            style="margin-right: 30px;"
+                    >
+                        <HomeLogo/>
+                    </g-link>
+                    <ClientOnly>
+                        <Search v-if="!isSmall"></Search>
+                    </ClientOnly>
+
+                </div>
+
+                <div class="flex flex-col items-center px-3   mr-auto  sm:flex-row"
+                     style="justify-content:flex-end; margin-right:1.5%;">
+                    <!-- <div class="modal-container">
+                        <input id="modal-toggle" type="checkbox">
+                        <label class="modal-btn"
+                            for="modal-toggle" 
+                            style="display: block;
+                                width:120px;
+                                height:36px;
+                                line-height: 36px;
+                                margin: 0 auto;
+                                font-weight: 500;
+                                font-size:24px;
+                                color: #fff;
+                                background: #5a67d8;
+                                font-size: 14px;
+                                border: 0;
+                                border-radius: 4px;
+                                cursor: pointer;
+                                text-align: center;
+                                box-shadow: 0 5px 5px -5px #333;
+                                transition: background 0.3s ease-in;" 
+                            >커리큘럼 보기</label> 
+                        <label class="modal-backdrop" for="modal-toggle"></label>
+                        <div class="modal-content">
+                            <label class="modal-close" for="modal-toggle">&#x2715;</label>
+                            <h2>Cloud Native Modeling & Application 구현과정 교안</h2><hr />
+                            <g-image class="g-images" src="~/img/05_Community/04_교육상담_및_신청/image7.png"></g-image>
+                            <g-image class="g-images" src="~/img/05_Community/04_교육상담_및_신청/image8.png"></g-image>
+                            <g-image class="g-images" src="~/img/05_Community/04_교육상담_및_신청/image9.png"></g-image>
+                            <g-image class="g-images" src="~/img/05_Community/04_교육상담_및_신청/image10.png"></g-image>
+                        </div>
+                    </div>  -->
+                    <v-btn style="background-color:#5a67d8 !important;
+                        border-radius: 4px;
+                        margin-left:-10px;
+                        height: 36px;
+                        width: 120px;
+                        text-align: center;
+                        line-height: 36px;
+                        font-size: 14px;
+                        font-weight: 700;"
+                        :href="'http://www.msaschool.io/operation/education/schedule/'"
+                    ><span style="color:white;">교과정 안내</span>
+                    </v-btn>
+                </div>
+
+            </div>
         </div>
-
-        <div class="w-full px-2 sm:px-4 max-w-screen-xs">
-          <ClientOnly>
-            <Search />
-          </ClientOnly>
-        </div>
-
-        <div class="flex items-center justify-end px-2 sm:px-4">
-
-          <a v-if="settings.web" :href="settings.web" class="hidden ml-3 sm:block" target="_blank" rel="noopener noreferrer" title="Website" name="Website">
-            <GlobeIcon size="1.5x" />
-          </a>
-
-          <a v-if="settings.twitter" :href="settings.twitter" class="hidden ml-3 sm:block" target="_blank" rel="noopener noreferrer" title="Twitter" name="Twitter">
-            <TwitterIcon size="1.5x" />
-          </a>
-
-          <a v-if="settings.github" :href="settings.github" class="sm:ml-3" target="_blank" rel="noopener noreferrer" title="Github" name="Github">
-            <GithubIcon size="1.5x" />
-          </a>
-
-          <div style = "width:50px; height:50px; text-aling:center; line-height:50px; font-weight:700;">
-            <a href = "https://intro.msaez.io">English</a>
-          </div>
-
-          <ToggleDarkMode class="ml-2 sm:ml-8">
-            <template slot="default" slot-scope="{ dark }">
-              <MoonIcon v-if="dark" size="1.5x" />
-              <SunIcon v-else size="1.5x" />
-            </template>
-          </ToggleDarkMode>
-        </div>
-      </div>
     </div>
-  </div>
 </template>
 
 <static-query>
@@ -80,17 +102,15 @@ query {
 </static-query>
 
 <script>
-import ToggleDarkMode from "@/components/ToggleDarkMode";
-import Logo from '@/components/Logo';
+import HomeLogo from '@/components/HomeLogo';
 import { SunIcon, MoonIcon, GlobeIcon, GithubIcon, TwitterIcon } from "vue-feather-icons";
 
 const Search = () => import(/* webpackChunkName: "search" */ "@/components/Search").catch(error => console.warn(error));
 
 export default {
   components: {
-    Logo,
+    HomeLogo,
     Search,
-    ToggleDarkMode,
     SunIcon,
     MoonIcon,
     GlobeIcon,

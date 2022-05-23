@@ -1,47 +1,47 @@
 <template>
-  <div class="font-sans antialiased text-ui-typo bg-ui-background">
-    <div class="flex flex-col justify-start min-h-screen">
+    <div class="font-sans antialiased text-ui-typo bg-ui-background">
+        <div class="flex flex-col justify-start min-h-screen">
+            <header
+                    ref="header"
+                    class="sticky top-0 z-10 w-full border-b bg-ui-background border-ui-border"
+                    @resize="setHeaderHeight"
+                    style="position:fixed; width:100%;"
+            >
+                <LayoutHeader/>
+            </header>
 
-      <header
-        ref="header"
-        class="sticky top-0 z-10 w-full border-b bg-ui-background border-ui-border"
-        @resize="setHeaderHeight"
-      >
-        <LayoutHeader />
-      </header>
+            <main style="max-width:1800px;" class="container relative flex flex-wrap justify-start flex-1 w-full bg-ui-background">
 
-      <main class="container relative flex flex-wrap justify-start flex-1 w-full bg-ui-background">
+                <aside
+                        v-if="hasSidebar"
+                        class="sidebar"
+                        :class="{ 'open': sidebarOpen }"
+                        :style="sidebarStyle"
+                >
+                    <div class="w-full pb-16 bg-ui-background">
+                        <Sidebar @navigate="sidebarOpen = false" style="margin-left:15px;" />
+                    </div>
+                </aside>
 
-        <aside
-          v-if="hasSidebar"
-          class="sidebar"
-          :class="{ 'open': sidebarOpen }"
-          :style="sidebarStyle"
-        >
-          <div class="w-full pb-16 bg-ui-background">
-            <Sidebar @navigate="sidebarOpen = false" />
-          </div>
-        </aside>
+                <div
+                        class="w-full pb-24"
+                        :class="{'pl-0 lg:pl-12 lg:w-3/4': hasSidebar}"
+                >
+                    <slot/>
+                </div>
 
-        <div
-          class="w-full pb-24"
-          :class="{'pl-0 lg:pl-12 lg:w-3/4': hasSidebar}"
-        >
-          <slot />
+            </main>
+
         </div>
 
-      </main>
-
+        <div v-if="hasSidebar" class="fixed bottom-0 right-0 z-50 p-8 lg:hidden">
+            <button class="p-3 text-white rounded-full shadow-lg bg-ui-primary hover:text-white"
+                    @click="sidebarOpen = ! sidebarOpen">
+                <XIcon v-if="sidebarOpen"/>
+                <MenuIcon v-else/>
+            </button>
+        </div>
     </div>
-
-    <div v-if="hasSidebar" class="fixed bottom-0 right-0 z-50 p-8 lg:hidden">
-      <button class="p-3 text-white rounded-full shadow-lg bg-ui-primary hover:text-white" @click="sidebarOpen = ! sidebarOpen">
-        <XIcon v-if="sidebarOpen" />
-        <MenuIcon v-else />
-      </button>
-    </div>
-    <!-- <Footer></Footer> -->
-  </div>
 </template>
 
 <static-query>
@@ -56,7 +56,6 @@ query {
 import Sidebar from "@/components/Sidebar";
 import LayoutHeader from "@/components/LayoutHeader";
 import { MenuIcon, XIcon } from 'vue-feather-icons';
-import Footer from '@/components/Footer';
 
 export default {
   components: {
@@ -64,7 +63,6 @@ export default {
     LayoutHeader,
     MenuIcon,
     XIcon,
-    Footer
   },
   data() {
     return {

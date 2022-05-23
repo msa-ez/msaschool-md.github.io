@@ -74,7 +74,6 @@
 <script>
 import Logo from '@/components/Logo';
 import { ArrowRightCircleIcon, ZapIcon, CodeIcon, MoonIcon, SearchIcon } from 'vue-feather-icons';
-import Footer from '@/components/Footer';
 
 export default {
   components: {
@@ -84,7 +83,6 @@ export default {
     CodeIcon,
     MoonIcon,
     SearchIcon,
-    Footer
   },
 
   metaInfo() {
