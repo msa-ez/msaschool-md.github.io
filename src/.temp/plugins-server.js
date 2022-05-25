@@ -1,6 +1,6 @@
-import plugin_gridsome_plugin_tailwindcss_6 from "/Users/kevinkim/Desktop/msaschool-md.github.io/node_modules/gridsome-plugin-tailwindcss/gridsome.client.js"
-import plugin_gridsome_plugin_google_analytics_7 from "/Users/kevinkim/Desktop/msaschool-md.github.io/node_modules/@gridsome/plugin-google-analytics/gridsome.client.js"
-import plugin_project_9 from "/Users/kevinkim/Desktop/msaschool-md.github.io/gridsome.client.js"
+import plugin_gridsome_plugin_tailwindcss_6 from "/Users/kevinkim/Desktop/vscode/msaschool-md.github.io/node_modules/gridsome-plugin-tailwindcss/gridsome.client.js"
+import plugin_gridsome_plugin_google_analytics_7 from "/Users/kevinkim/Desktop/vscode/msaschool-md.github.io/node_modules/@gridsome/plugin-google-analytics/gridsome.client.js"
+import plugin_project_9 from "/Users/kevinkim/Desktop/vscode/msaschool-md.github.io/gridsome.client.js"
 
 export default [
   {

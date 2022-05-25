@@ -15,7 +15,7 @@
                 <!--                </div>-->
 
 
-                <div class="flex flex-col items-center sm:flex-row" style="margin-left:5%; place-self:center;">
+                <div class="flex flex-col items-center sm:flex-row" style="margin-left:5%; place-self:center; width:1100px;">
                     <!--                <div class="flex flex-col items-center px-3  mr-auto  sm:flex-row" style="margin-left:5%;">-->
                     <g-link
                             to="http://www.msaschool.io/operation/introduction/"
@@ -25,7 +25,7 @@
                         <HomeLogo/>
                     </g-link>
                     <ClientOnly>
-                        <Search v-if="!isSmall"></Search>
+                        <Search class="small-view-search"></Search>
                     </ClientOnly>
 
                 </div>
@@ -72,8 +72,7 @@
                         line-height: 36px;
                         font-size: 14px;
                         font-weight: 700;"
-                        :href="'http://www.msaschool.io/operation/education/schedule/'"
-                    ><span style="color:white;">교과정 안내</span>
+                    ><span ><g-link style="color:white;" to="http://www.msaschool.io/operation/education/schedule/">실 습 하 기</g-link></span>
                     </v-btn>
                 </div>
 
@@ -117,14 +116,11 @@ export default {
     GithubIcon,
     TwitterIcon
   },
-
-  computed: {
-    meta() {
-      return this.$static.metadata;
-    },
-    settings() {
-      return this.meta.settings;
-    }
+  meta() {
+    return this.$static.metadata;
+  },
+  settings() {
+    return this.meta.settings;
   }
 };
 </script>
@@ -143,4 +139,14 @@ header {
     @apply text-ui-primary font-bold border-ui-primary;
   }
 }
+</style>
+<style>
+  .small-view-search {
+    display: block;
+  }
+  @media only screen and (max-width:1025px) {
+      .small-view-search {
+        display: none;
+      }
+  }
 </style>

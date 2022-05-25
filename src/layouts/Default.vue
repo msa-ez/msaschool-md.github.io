@@ -19,7 +19,7 @@
                         :style="sidebarStyle"
                 >
                     <div class="w-full pb-16 bg-ui-background">
-                        <Sidebar @navigate="sidebarOpen = false" style="margin-left:15px;" />
+                        <Sidebar @navigate="sidebarOpen = false" style="margin-left:-15px;" />
                     </div>
                 </aside>
 

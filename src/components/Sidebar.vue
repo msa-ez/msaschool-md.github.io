@@ -4,6 +4,10 @@
     v-if="showSidebar"
     class="pt-6 lg:pt-10"
   >
+      <ClientOnly>
+          <Search class="px-8 sidebar-search" style="margin-bottom:20px;"></Search>
+      </ClientOnly>
+
     <div class="py-3 px-4 mb-4 border-ui-border"
       :class="{ 'border-b': index < sidebar.sections.length -1 }">
       <g-link
@@ -19,7 +23,7 @@
       class="pb-4 px-4 mb-4 border-ui-border"
       :class="{ 'border-b': index < sidebar.sections.length -1 }"
     >
-      <h3 class="pt-0 mt-0 mb-1 text-lg tracking-tight uppercase border-none">
+      <h3 style="font-weight:700" class="pt-0 mt-0 mb-1 text-lg tracking-tight uppercase border-none">
         {{ section.title }}
       </h3>
 
@@ -60,7 +64,12 @@ query Sidebar {
 </static-query>
 
 <script>
+const Search = () => import(/* webpackChunkName: "search" */ "@/components/Search").catch(error => console.warn(error));
+
 export default {
+  components: {
+    Search
+  },
   data() {
     return {
       expanded: []
@@ -96,3 +105,13 @@ export default {
   },  
 };
 </script>
+<style>
+  .sidebar-search {
+    display: none;
+  }
+  @media only screen and (max-width:1025px) {
+      .sidebar-search {
+        display: block;
+      }
+  }
+</style>
