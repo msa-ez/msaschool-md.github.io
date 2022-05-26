@@ -22,7 +22,7 @@
         @blur="focused = false"
         @input="focusIndex = -1; query = $event.target.value"
         @change="query = $event.target.value"
-        style="height:40px; margin-top:3px;"
+        style="height:40px; margin-top:1px; padding-bottom:-2px;"
       />
     </label>
     <div 

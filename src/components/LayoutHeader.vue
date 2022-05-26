@@ -149,4 +149,9 @@ header {
         display: none;
       }
   }
+  @media only screen and (max-width:1025px) {
+      .small-view-btn {
+        margin: 15px 0 15px 0;
+      }
+  }
 </style>

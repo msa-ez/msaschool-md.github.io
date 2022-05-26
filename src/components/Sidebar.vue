@@ -2,7 +2,7 @@
   <div
     ref="sidebar"
     v-if="showSidebar"
-    class="pt-6 lg:pt-10"
+    class="pt-6 lg:pt-10 sidebar-title"
   >
       <ClientOnly>
           <Search class="px-8 sidebar-search" style="margin-bottom:20px;"></Search>
@@ -112,6 +112,11 @@ export default {
   @media only screen and (max-width:1025px) {
       .sidebar-search {
         display: block;
+      }
+  }
+  @media only screen and (max-width:1025px) {
+      .sidebar-title {
+        padding-left:20px;
       }
   }
 </style>
