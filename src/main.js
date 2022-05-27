@@ -24,7 +24,11 @@ Vue.use(VueAnalytics, {
 export default function (Vue, { router, head, isClient }) {
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
-
+  head.link.push({
+    rel: "stylesheet",
+    href:
+        "https://cdn.jsdelivr.net/npm/@mdi/font@latest/css/materialdesignicons.min.css"
+  });
   router.beforeEach((to, _from, next) => {
     head.meta.push({
       key: 'og:url',

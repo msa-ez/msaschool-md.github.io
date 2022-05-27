@@ -15,7 +15,7 @@
                 <!--                </div>-->
 
 
-                <div class="flex flex-col items-center sm:flex-row" style="margin-left:5%; place-self:center; width:1100px;">
+                <div class="flex flex-col items-center sm:flex-row small-view-header" style="margin-left:5%; place-self:center; width:1100px;">
                     <!--                <div class="flex flex-col items-center px-3  mr-auto  sm:flex-row" style="margin-left:5%;">-->
                     <g-link
                             to="http://www.msaschool.io/operation/introduction/"
@@ -71,8 +71,10 @@
                         text-align: center;
                         line-height: 36px;
                         font-size: 14px;
-                        font-weight: 700;"
-                    ><span ><g-link style="color:white;" to="http://www.msaschool.io/operation/education/schedule/">실 습 하 기</g-link></span>
+                        font-weight: 700;
+                        cursor:pointer;"
+                        onclick="location.href='https://labs.msaez.io/#/'"
+                    ><span style="color:white;">실 습 하 기</span>
                     </v-btn>
                 </div>
 
@@ -142,16 +144,17 @@ header {
 </style>
 <style>
   .small-view-search {
-    display: block;
+    display: none;
   }
-  @media only screen and (max-width:1025px) {
-      .small-view-search {
-        display: none;
-      }
-  }
-  @media only screen and (max-width:1025px) {
-      .small-view-btn {
-        margin: 15px 0 15px 0;
-      }
+  @media only screen and (min-width:1025px) {
+    .small-view-header {
+      margin: -2px 0 -2px 0;
+    }
+    .small-view-search {
+      display: block;
+    }
+    .small-view-btn {
+      margin: 15px 0 15px 0;
+    }
   }
 </style>

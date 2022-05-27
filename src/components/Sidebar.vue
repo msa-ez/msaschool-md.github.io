@@ -5,7 +5,7 @@
     class="pt-6 lg:pt-10 sidebar-title"
   >
       <ClientOnly>
-          <Search class="px-8 sidebar-search" style="margin-bottom:20px;"></Search>
+          <Search class="px-4 sidebar-search" style="margin-top:-4px; margin-bottom:10px;"></Search>
       </ClientOnly>
 
     <div class="py-3 px-4 mb-4 border-ui-border"
@@ -110,13 +110,11 @@ export default {
     display: none;
   }
   @media only screen and (max-width:1025px) {
-      .sidebar-search {
-        display: block;
-      }
-  }
-  @media only screen and (max-width:1025px) {
-      .sidebar-title {
-        padding-left:20px;
-      }
+    .sidebar-search {
+      display: block;
+    }
+    .sidebar-title {
+      padding-left:16px;
+    }
   }
 </style>

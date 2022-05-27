@@ -37,9 +37,19 @@
         <div v-if="hasSidebar" class="fixed bottom-0 right-0 z-50 p-8 lg:hidden">
             <button class="p-3 text-white rounded-full shadow-lg bg-ui-primary hover:text-white"
                     @click="sidebarOpen = ! sidebarOpen">
-                <XIcon v-if="sidebarOpen"/>
-                <MenuIcon v-else/>
+                <div v-if="sidebarOpen">
+                    <XIcon/>
+                </div>
+                <div v-else>
+                    <MenuIcon/>
+                </div>
             </button>
+        </div>
+        <div style="position: fixed; z-index:999; right:5px; bottom:5px;">
+          <button class="show-chat-icon" style="background-color:gold; color:#4E342E; border-radius:100%; height:40px; width:40px; border:0; outline:0;"
+                  onclick="window.open('https://open.kakao.com/me/msaschool')">
+              <span class="mdi mdi-wechat" style="font-size:30px;"></span>
+          </button>
         </div>
     </div>
 </template>
@@ -316,4 +326,14 @@ table {
     transform: translateX(0);
   }
 }
+</style>
+<style>
+  .show-chat-icon {
+    display: none;
+  }
+  @media only screen and (min-width:1025px) {
+    .show-chat-icon {
+      display: block;
+    }
+  }
 </style>
