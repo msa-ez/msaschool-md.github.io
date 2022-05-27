@@ -9,13 +9,11 @@
       </ClientOnly>
 
     <div class="py-3 px-4 mb-4 border-ui-border"
-      :class="{ 'border-b': index < sidebar.sections.length -1 }">
-      <g-link
-        to="http://www.msaschool.io/operation/introduction/"
-        style="font-weight: 900; font-size: 17px;"
-      >
+      :class="{ 'border-b': index < sidebar.sections.length -1 }"
+      onclick="location.href='http://www.msaschool.io/operation/introduction/'">
+      <span style="font-weight: 900; font-size: 17px; cursor:pointer;">
       돌아가기
-      </g-link>
+      </span>
     </div>
     <div
       v-for="(section, index) in sidebar.sections"
