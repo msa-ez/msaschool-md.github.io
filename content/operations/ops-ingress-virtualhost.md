@@ -7,6 +7,8 @@ next: ''
 
 # Ingress - Virtual Host based
 
+# Ingress - Virtual Host based
+
 ## Virtual Host based Ingress Example
 
 ```

@@ -5,116 +5,143 @@ prev: ''
 next: ''
 ---
 
-# [구현] Pub/Sub - Compensation and Correlation
+# Data Projection with Frontend and HATEOAS
 
-### Compensation and Correlation
+# Data Projection with Frontend and HATEOAS
 
-이전 랩에서 주문을 생성하는 OrderPlaced 라는 이벤트를 발행하였다.  
-이번 랩에서는 주문서비스에서 주문을 취소하는 OrderCancelled 라는 이벤트를 발행 하고,  
-배송 서비스에서는 OrderCancelled 이벤트를 수신하여 DeliveryCancelled 라는 이벤트를 발행한다.  
+### 프론트엔드를 기반한 Data Projection
 
-### 작업순서  
-
-#### 주문서비스에서 주문을 취소하는 작업 
-Aggregate 에서 이벤트 발행 
-- Ctrl + p로 Order.java 리소스 찾기  
-- Order.java 27라인에 아래 로직 추가 후 저장
-```java
-@PreRemove
-public void onPreRemove(){
-    OrderCancelled orderCancelled = new OrderCancelled();
-    BeanUtils.copyProperties(this, orderCancelled);
-    orderCancelled.publishAfterCommit();
-}
+#### 기본 생성된 프론트엔드를 테스트
+- 모든 마이크로 서비스를 기동시킨다.
+- 생성된 프론트엔드 서비스를 기동시킨다.
 ```
-  
-OrderCancelled 도메인 이벤트 클래스 생성  
-- shopmall 패키지에서 마우스 오른쪽 메뉴에서 'New File' 선택
-- OrderCancelled.java 파일을 생성 한 후, OrderPlaced.java 파일 내용을 모두 복사한다.
-- public class OrderCancelled 로 클래스명을 변경하고 저장한다.
-
-주문삭제 커맨드를 실행하여 OrderCancelled 이벤트 발행 확인
-
-- 주문 서비스 및 카프카 Consumer 실행 
+cd frontend
+npm i
+npm run serve
 ```
+- 브라우저를 통하여 8080 서비스로 접속해본다
+- 게이트웨이를 기동시킨다:
+```
+cd gateway
 mvn spring-boot:run
-/usr/local/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic shopmall --from-beginning
+```
+- 게이트웨이를 통하여 접속해본다 (8088)
+- 게이트웨이를 통해서만 API 가 호출됨을 알 수 있다 (CORS: Cross-Origin-Resource-Sharing Issue)
+
+- 주문을 하기 위해 재고량을 우선 등록한다:
+```
+http :8082/inventories id=1 stock=10
 ```
 
-- 주문 생성 후, 삭제     
+- 다음과 같이 UI 에 접근하여 주문을 해본다:
+
+<img width="574" alt="image" src="https://user-images.githubusercontent.com/487999/191061282-9cba3a28-219e-4fde-baa9-f9713b3f889a.png">
+
+<img width="574" alt="image" src="https://user-images.githubusercontent.com/487999/191061179-211ff733-b7c7-4d26-9c33-e146ed565bf5.png">
+
+<img width="574" alt="image" src="https://user-images.githubusercontent.com/487999/191061043-c9796f3f-4758-4052-aff4-71171f0c14fe.png">
+
+
+
+
+#### Order UI를 통한 Delivery 와 Inventory 정보의 통합
+
+- Order.vue 의 템플릿내(template Tag)에 Delivery 태그를 추가하여 Delivery 가 불려지도록 구현한다:
+
 ```
-http localhost:8081/orders productId=1 productName="TV" qty=3
-http DELETE localhost:8081/orders/1
+        <v-card-text>
+            <String label="ProductId" v-model="value.productId" :editMode="editMode"/>
+            <Number label="Qty" v-model="value.qty" :editMode="editMode"/>
+            <String label="CustomerId" v-model="value.customerId" :editMode="editMode"/>
+            <Number label="Amount" v-model="value.amount" :editMode="editMode"/>
+            <String label="Status" v-model="value.status" :editMode="editMode"/>
+            <String label="Address" v-model="value.address" :editMode="editMode"/>
+
+            <Inventory v-model="inventory"></Inventory>
+
+        </v-card-text>
+
 ```
 
-#### 배송서비스에서 주문 삭제시 배송을 취소하는 작업  
+- v-model 로 연결된 변수인 inventory 를 선언해주고 기본 데이터를 준다:
+```
+        data: () => ({
+            snackbar: {
+                status: false,
+                timeout: 5000,
+                text: ''
+            },
+            inventory: {stock: 5}
+        }),
 
-배송서비스의 PolicyHandler 코드 수정 
-- PolicyHandler.java 29라인에 아래 이벤트 수신 시, 실행할 로직을 추가한다. 
-- List 클래스에 대한 임포트를 추가해 준다.(import java.util.List;)
-```java
-@StreamListener(KafkaProcessor.INPUT)
-public void wheneverOrderCancelled_DeleteDelivery(@Payload OrderCancelled orderCancelled){
-    if(orderCancelled.isMe()){
-        List<Delivery> deliveryList = deliveryRepository.findByOrderId(orderCancelled.getId());
-        if ((deliveryList != null) && !deliveryList.isEmpty()){
-            deliveryRepository.deleteAll(deliveryList);
-        }
+```
+- 화면에 다음과 같이 출력됨을 확인한다:
+
+<img width="462" alt="image" src="https://user-images.githubusercontent.com/487999/191063786-aa08928e-eda9-41a4-9c21-bcb9ccdddef5.png">
+
+- Inventory data 를 동적으로 로딩하여 채워넣기
+```
+        data: () => ({
+            snackbar: {
+                status: false,
+                timeout: 5000,
+                text: ''
+            },
+            inventory: null
+        }),
+        async created(){
+            var result = await axios.get('/inventories/' + this.value.productId);
+            this.inventory = result.data;
+        },
+    ...
+```
+
+#### HATEOAS Link 를 통한 동적인 데이터 연관 관계 처리
+
+- order/../infra/OrderHateoasProcessor.java:
+```
+@Component
+public class OrderHateoasProcessor implements RepresentationModelProcessor<EntityModel<Order>>  {
+
+    @Override
+    public EntityModel<Order> process(EntityModel<Order> model) {
+        model.add(Link.of("/inventories/" + model.getContent().getProductId()).withRel("inventory"));
+        
+        return model;
     }
-}
-```
-
-OrderCancelled 도메인 이벤트 클래스 복제
-- order 서비스의 OrderCancelled.java 파일을 복사하여 delivery 서비스의 shopmall 패키지에 붙여넣는다.  
-
-주문번호에 해당하는 배송을 취소하기 위해서는 주문 ID에 맞는 배송 Entity를 찾아야 한다.
-- DeliveryRepository.java 파일에서 아래와 같이 주문 아이디별 배송을 찾는 로직을 추가(7라인)한다.
-```java  
-List<Delivery> findByOrderId(Long orderId);
-```
-- (import 구문이 필요하다. import java.util.List; )
     
-
-Delivery Aggregate 에서 삭제시 이벤트 발행
-- Delivery.java 에 아래 로직 입력(25라인)
-
-```java
-@PreRemove
-public void onPreRemove(){
-    DeliveryCancelled deliveryCancelled = new DeliveryCancelled();
-    BeanUtils.copyProperties(this, deliveryCancelled);
-    deliveryCancelled.publishAfterCommit();
 }
 ```
-
-DeliveryCancelled 이벤트 생성
-- DeliveryCancelled.java 파일을 생성 한 후, DeliveryStarted.java 파일의 내용을 복사하여 붙여 넣는다.  
-- public class DeliveryCancelled 로 클래스명과 생성자 이름을 변경한다.
-      
-  
-확인
-- 파일 저장여부를 확인하고 주문과 배송서비스 모두 재기동한다.
-- 새로운 주문과 주문삭제 커맨드로 DeliveryCancelled 이벤트 발행 확인 
+- 생성된 HATEOAS Link 를 확인:
 ```
-http localhost:8081/orders productId=1 productName="TV" qty=3
-http localhost:8081/orders
-http localhost:8082/deliveries
-http DELETE localhost:8081/orders/1
+> http :8081/orders
+{
+    "_links": {
+        "inventory": {
+            "href": "/inventories/1"
+        },
+        "order": {
+            "href": "http://localhost:8081/orders/1"
+        },
+        "self": {
+            "href": "http://localhost:8081/orders/1"
+        }
+    },
+    "address": "Everland",
+    "amount": null,
+    "customerId": "jjy",
+    "productId": "1",
+    "qty": 1,
+    "status": null
+}
 ```
-- kafka Consumer에서 이벤트 확인
-
-#### Checkpoints 확인  
-- 1번과 2번작업을 모두 정상적으로 실행한다.  
-- IDE 상단의 메뉴에서 labs > 결과제츨 버튼을 클릭한다.  
-
-
-#### Service Clear
-- 다음 Lab을 위해 기동된 모든 서비스 종료
+- Order.vue 에서 Inventory 데이터에 대한 URI 주소를 HATEOAS Link 를 통해서 간접적으로 주소를 획득하도록 수정:
+```
+        async created(){
+            var result = await axios.get(this.value._links.inventory.href);
+            this.inventory = result.data;
+        },
 
 ```
-fuser -k 8081/tcp
-fuser -k 8082/tcp
-```
 
-#### 상세설명
-<iframe width="100%" height="100%" src="https://www.youtube.com/embed/l87qvRN_Qn0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+### 확장시나리오: 배송정보를 통합하여 출력

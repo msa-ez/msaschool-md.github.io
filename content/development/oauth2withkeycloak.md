@@ -5,154 +5,187 @@ prev: ''
 next: ''
 ---
 
-# JWT토큰 기반 인증인가 w/ Keycloak Authz-svr
+# Req/Res 방식에서 장애전파 차단 - 서킷브레이커 (New)
 
-### JWT 토큰기반 인증 w/ Keycloak
+# Req/Res 방식에서 장애전파 차단 - 서킷브레이커 (New)
 
-#### OAuth2 Stackholders
-- Spring Security와 Spring oauth2를 사용하고, Resource Owner, Client, Authorization Server, Resource Server간의 인증/인가를 실습한다.
-- 여기서 Resouce란 Gateway를 경유하는 Rest APIs를 말한다. 
-- JWT기반 Access_Token을 활용한다.
-- 이번 랩에서는 Gateway를 Client와 Resource Server 역할로 설정한다. 
-- 인증/인가 서버로는 Keycloak(https://www.keycloak.org/) 서버를 활용한다.
+### 서킷브레이커를 통하여 장애 전파를 차단
 
+#### 이벤트스토밍
 
-#### OAuth2 인증/인가(Keycloak) Endpoint 설정
+서킷브레이커 테스트를 위하여 monolith 에서 order Command 에서 inventory 의 재고량을 조회하는(GET) 호출을 그린다
 
-- Gateway 서비스의 application.yml 파일을 열어본다.
-- 인증/인가를 위한 Authorization Sever의 Endpoint가 등록된다.
-```yaml
-  security:
-    oauth2:
-      client:
-        provider:
-          my-keycloak-provider:
-            issuer-uri: http://localhost:8080/realms/my_realm
-```
+- order command 에서 Inventory Aggregate 로 선을 연결한다. 
 
-- KeyCloak에 등록된 Client(Gateway)의 Credential정보가 설정된다.
-- OAuth2의 Grant Type을 password 방식으로 설정한다.
-```yaml
-          keycloak-spring-gateway-client:
-            provider: my-keycloak-provider
-            client-id: my_client
-            client-secret: HKFKYP7kb8OMldAgfvnk27FhRPOv8Y7H
-            authorization-grant-type: password
-```
+<img width="899" alt="image" src="https://user-images.githubusercontent.com/487999/190903135-a6bb95c0-d1f6-424e-9444-1bbf0119386a.png">
 
-#### OAuth2 Security 상세설정
-- Gateway 서비스의 SecurityConfig.java 파일을 열어본다.
-- spring-cloud-gateway 는 webflux로 기동되기 때문에 @EnableWebFluxSecurity를 적용한다.
-- ServerHttpSecurity 생성시, 접근제어목록(ACL)을 적용한다.
-- .oauth2Login() OAuth2의 디폴트 로그인 설정이 적용된다.
-- .oauth2ResourceServer() 리소스서버 역할을 부여하고 jwt 형식의 Authorization을 지정한다.
+- 연결한 선을 더블 클릭하여 호출이름을 다음과 같이 준다: get availability
+- 호출선의 설정에서 Circuit breaker 옵션을 On 한다
+
+<img width="452" alt="image" src="https://user-images.githubusercontent.com/487999/190903010-1f789fc6-bc4e-4ad5-a7fd-a2a51b11c940.png">
 
 
-#### 서비스 구동
+#### 생성 코드 확인과 구현
 
-- 먼저 Keycloak 서버를 구동한다.
-```sh
-cd keycloak/bin
-./kc.sh start-dev
-```
-
-- keycloak 서버의 default 포트인 8080으로 실행된다.
-- 포트 확인 (Labs > 포트확인)
-
-- Gateway, Order 서비스를 구동한다.
-```sh
-cd gateway
-mvn spring-boot:run
-cd order
-mvn spring-boot:run
-```
-- 각각 8088, 8081 포트로 기동된다.
-
-
-#### Protected 리소스 접근
-- Security ACL설정(SecurityConfig.java)에 따라 Gateway 서버나 주문서비스에 접근해 본다.
-```sh
-http http://localhost:8088
-http http://localhost:8088/orders
-```
-- 401(Unauthorized) 접근오류 응답이 내려온다.
-
-- 허가된 리소스에 접근해 본다.
-```sh
-http http://localhost:8088/test/permitAll
-```
-- 접근 가능하다. 
-
-
-#### JWT access_token 발급
-
-- Keycloak의 인증/인가 Endpoint에 토큰을 요청한다.
-- OAuth2의 Grant type은 'password'로 요청한다.
-- Keycloak에 기 등록된 Client정보와 사용자 정보를 제공한다.
-```sh
-curl -X POST "http://localhost:8080/realms/my_realm/protocol/openid-connect/token" \
---header "Content-Type: application/x-www-form-urlencoded" \
---data-urlencode "grant_type=password" \
---data-urlencode "client_id=my_client" \
---data-urlencode "client_secret=HKFKYP7kb8OMldAgfvnk27FhRPOv8Y7H" \
---data-urlencode "username=user@uengine.org" \
---data-urlencode "password=1" 
-```
-
-- 응답으로 access_token과 refresh_token이 내려온다.
-- 출력된 access_token을 복사하여 https://jwt.io/ 페이지에 접속 후 decode해 본다.
-> Header, Payload, Signature로 파싱된다.	
-- user@uengine.org 계정이 가진 Role은 ROLE_USER임을 확인한다.
-
-
-#### access_token으로 Protected 리소스 접근
-- access_token을 복사하여 Request Header에 넣어 Protected 리소스에 접근한다.
-```sh
-export access_token=[ACCESS_TOKEN]
-echo $access_token
-http localhost:8088/orders "Authorization: Bearer $access_token"
-http localhost:8088/test/user "Authorization: Bearer $access_token"
-http localhost:8088/test/authenticated "Authorization: Bearer $access_token"
-http localhost:8088/test/admin "Authorization: Bearer $access_token"
-```
-
-- '/test/admin' 리소스는 권한이 불충분(403 Fobidden)하여 접근할 수 없다.
-- 관리자 권한이 있는 계정으로 다시 한번 토큰을 요청한다.
-
-```sh
-curl -X POST "http://localhost:8080/realms/my_realm/protocol/openid-connect/token" \
---header "Content-Type: application/x-www-form-urlencoded" \
---data-urlencode "grant_type=password" \
---data-urlencode "client_id=my_client" \
---data-urlencode "client_secret=HKFKYP7kb8OMldAgfvnk27FhRPOv8Y7H" \
---data-urlencode "username=admin@uengine.org" \
---data-urlencode "password=1" 
-``` 
-
-- access_token을 복사하여 Request Header에 넣어 Protected 리소스에 접근한다.
-```sh
-export access_token=[ACCESS_TOKEN]
-http localhost:8088/test/admin "Authorization: Bearer $access_token"
-```
-
-- 정상적으로 접근이 가능하다.
-
-
-#### Wrap up
-- Gateway가 리소스서버 역할까지 수행하므로 각 마이크로서비스 리소스들의 Fine grained한 접근제어를 Gateway에서 관리
-- 이로 인해 ACL 정보 가독성이 떨어지거나, ACL 오류발생 시 잠재적 분쟁 소지
-- MSA별 Autonomous ACL 관리책임 분산을 위해 인증 및 인가를 분리하는 정책 권고
-- Gateway는 인증을 포함한 Coarse grained ACL Policy를 담당하고, 각 MSA에서 Fine grained한 ACL Policy 적용
-
-
-#### Service Clear
-- 다음 Lab을 위해 기동된 모든 서비스 종료
+- monolith/../Order.java 의 @PrePersist
 
 ```
-fuser -k 8080/tcp
-fuser -k 8081/tcp
-fuser -k 8088/tcp
+@PrePersist
+public void onPrePersist() {
+    // Get request from Inventory
+    Inventory inventory =
+        Application.applicationContext.getBean(InventoryService.class)
+        .getInventory(Long.valueOf(getProductId()));
+
+    if(inventory.getStock() < getQty()) throw new RuntimeException("Out of Stock!");
+
+}
 ```
 
-#### 상세설명
-<iframe width="100%" height="100%" src="https://www.youtube.com/embed/dsUW_JTvqIA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+> 재고 서비스를 호출한 결과 얻은 재고량을 확인하여 재고가 주문량에 못 미치면 오류를 내도록 하는 검증 로직을 추가
+- monolith/../external/InventoryService.java
+
+```
+@FeignClient(name = "inventory", url = "${api.url.inventory}")
+public interface InventoryService {
+    @RequestMapping(method = RequestMethod.GET, path = "/inventories/{id}")
+    public Inventory getInventory(@PathVariable("id") Long id);
+
+  ...
+}
+```
+
+> 재고량을 얻기 위한 GET 호출의 FeignClient Interface 확인
+
+
+
+#### 서킷브레이커 설정 전 호출 
+- monolith 서비스와 inventory 서비스를 실행한다. 
+- 충분한 재고량을 입력한다
+
+```
+http :8082/inventories id=1 stock=10000
+```
+
+- 부하 툴을 사용하여 동시사용자2명의 10초간의 주문을 넣어본다.
+
+```
+siege -c2 -t10S  -v --content-type "application/json" 'http://localhost:8081/orders POST {"productId":1, "qty":1}'
+```
+
+> siege 툴을 설치하려면 다음 명령으로 설치한다:
+
+```
+sudo apt update -y
+sudo apt install siege -y
+```
+		
+> 모든 호출이  201 Code 로 성공함을 알 수 있다.
+
+#### 서킷브레이커 설정
+
+- monolith 서비스의 application.yaml 파일의 다음 설정을 true 로 하고, 임계치를 610ms로 바꾼다:  
+
+````yaml
+
+feign:
+    hystrix:
+    enabled: true
+
+hystrix:
+    command:
+    # 전역설정
+    default:
+        execution.isolation.thread.timeoutInMilliseconds: 610
+````
+
+- inventory 서비스의 Inventory.java 를 GET 할때 성능이 느려지도록 딜레이 발생 코드를 넣는다.  
+
+
+````java
+@PostLoad
+public void makeDelay(){
+    try {
+        Thread.currentThread().sleep((long) (400 + Math.random() * 220));
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+
+}
+````
+
+- inventory 서비스를 종료하고 재실행한다. 
+- 이때 재고량을 충분히 줘놓아야 한다:
+
+```
+http :8082/inventories id=1 stock=10000
+```
+
+- 부하 툴을 사용하여 주문을 넣어본다.  
+
+```
+siege -c2 -t10S  -v --content-type "application/json" 'http://localhost:8081/orders POST {"productId":1, "qty":1}'
+```
+
+> Delay 가 발생함에 따라 적당히 201 code 와 500 오류 코드가 반복되며 inventory 로 부하를 조절하면서 요청을 관리하는 것을 확인할 수 있다.
+> 결과적으로 Availability 는 60~90% 수준이 유지되면서 서비스는 유지된다.
+
+- monolith 서비스의 로그를 확인:
+
+```
+java.lang.RuntimeException: Hystrix circuit short-circuited and is OPEN
+```
+
+> 서킷 브레이커가 발동하여 오류가 발생한 것을 확인할 수 있다.
+
+~~ [Tip] 임계치를 바꾸거나 delay 를 바꾸어 가면서 테스트해보세요 ~~
+
+#### fallback 처리 (장애시에 적당한 대체값)
+
+- inventory 서비스가 중지된 상태로 주문을 넣어본다. ( 500 에러 )
+
+```
+http localhost:8081/orders productId=1 qty=1 
+```
+
+- monolith 서비스의 external/InventoryService.java 의 FeignClient에 fallback 옵션을 준다.
+    
+```
+@FeignClient(name = "inventory", url = "${api.url.inventory}", fallback = InventoryServiceFallback.class)
+```
+ 
+- monolith 서비스에 Fallback 구현체를 구현한다:
+
+```
+package labshopmonolith.external;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class InventoryServiceFallback implements InventoryService{
+    public Inventory getInventory(Long id){
+        Inventory fallbackValue = new Inventory();
+        fallbackValue.setStock(1L);
+
+        return fallbackValue;
+    }
+}
+```
+
+- monolith 서비스를 재실행 후 주문을 넣어본다. ( 주문 가능 )
+    - 이때 inventory 서비스는 중지 상태 이어야 한다.  
+    - InventoryServiceImpl 의 getInventory 메서드가 실행되어 적당한 가짜 값인 1이 리턴되어 재고량이 있는 것으로 리턴하게 하는 것을 확인할 수 있다. 
+
+```
+http localhost:8081/orders productId=1 qty=1   # will succeed!
+```
+
+- qty를 1이상인 값으로도 호출해본다.
+
+```
+http localhost:8081/orders productId=1 qty=3   # will fail!
+```
+
+#### 다른 Circuit Breaker 들
+https://dzone.com/articles/comparing-envoy-and-istio-circuit-breaking-with-ne?fbclid=IwAR0wYnXPiAZSVtluJ-17Ywb9dK3xrytAMo3ImIZv8KwoOo2WGGnyTKm6c04
+

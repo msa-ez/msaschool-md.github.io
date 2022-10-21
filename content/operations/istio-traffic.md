@@ -7,6 +7,8 @@ next: ''
 
 # [Service Mesh] Istio 를 통한 동적 트래픽 라우팅
 
+# [Service Mesh] Istio 를 통한 동적 트래픽 라우팅
+
 ### Traffic Mgmt & Canary 배포
 
 #### Istio Tutorial 셋업

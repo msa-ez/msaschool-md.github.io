@@ -5,6 +5,8 @@ sidebar: 'business'
 
 # [이벤트스토밍] DDD 구글 드라이브 예제
 
+# [이벤트스토밍] DDD 구글 드라이브 예제
+
 ### 구글 드라이브 예제
 #### 아래 시나리오대로  이벤트 스토밍 하시오.
 (eventstorming 수준: Design level)

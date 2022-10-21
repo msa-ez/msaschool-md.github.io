@@ -1,6 +1,6 @@
-const c1 = () => import(/* webpackChunkName: "page--src--templates--markdown-page-vue" */ "/Users/kevinkim/Desktop/vscode/msaschool-md.github.io/src/templates/MarkdownPage.vue")
-const c2 = () => import(/* webpackChunkName: "page--src--pages--404-vue" */ "/Users/kevinkim/Desktop/vscode/msaschool-md.github.io/src/pages/404.vue")
-const c3 = () => import(/* webpackChunkName: "page--src--pages--index-vue" */ "/Users/kevinkim/Desktop/vscode/msaschool-md.github.io/src/pages/Index.vue")
+const c1 = () => import(/* webpackChunkName: "page--src--templates--markdown-page-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/templates/MarkdownPage.vue")
+const c2 = () => import(/* webpackChunkName: "page--src--pages--404-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/pages/404.vue")
+const c3 = () => import(/* webpackChunkName: "page--src--pages--index-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/pages/Index.vue")
 
 export default [
   {
@@ -52,15 +52,19 @@ export default [
     component: c1
   },
   {
+    path: "/operations/ops-service/",
+    component: c1
+  },
+  {
     path: "/operations/ops-utility/",
     component: c1
   },
   {
-    path: "/business/zero-based-cna/",
+    path: "/operations/msa-logging/",
     component: c1
   },
   {
-    path: "/operations/msa-logging/",
+    path: "/operations/istio-metric-based-hpa/",
     component: c1
   },
   {
@@ -89,10 +93,6 @@ export default [
   },
   {
     path: "/operations/end-to-end/",
-    component: c1
-  },
-  {
-    path: "/development/ops-docker/",
     component: c1
   },
   {
@@ -128,6 +128,10 @@ export default [
     component: c1
   },
   {
+    path: "/operations/apply-security/",
+    component: c1
+  },
+  {
     path: "/development/kafka-base/",
     component: c1
   },
@@ -148,31 +152,7 @@ export default [
     component: c1
   },
   {
-    path: "/development/dp-composite-svc/",
-    component: c1
-  },
-  {
-    path: "/development/capstone-project-1/",
-    component: c1
-  },
-  {
-    path: "/development/capstone-project-2/",
-    component: c1
-  },
-  {
-    path: "/development/dp-cqrs/",
-    component: c1
-  },
-  {
-    path: "/development/dp-graphql/",
-    component: c1
-  },
-  {
     path: "/business/ddd-google-drive/",
-    component: c1
-  },
-  {
-    path: "/business/design-to-code/",
     component: c1
   },
   {
@@ -188,23 +168,7 @@ export default [
     component: c1
   },
   {
-    path: "/development/cna-start/",
-    component: c1
-  },
-  {
-    path: "/development/contract-test/",
-    component: c1
-  },
-  {
-    path: "/development/cqrs-modeling/",
-    component: c1
-  },
-  {
     path: "/development/circuitbreaker/",
-    component: c1
-  },
-  {
-    path: "/business/collaborative-eventstorming/",
     component: c1
   },
   {

@@ -5,81 +5,66 @@ prev: ''
 next: ''
 ---
 
-# Kafka 수동커밋
+# Data Projection with CQRS
 
-### Kafka 수동 커밋 
+# Data Projection with CQRS
 
-#### Kafka 커밋모드 
+### CQRS 모델링 Practice
 
-- Kafka default 커밋모드는 autoCommit 이다.
-- Kafka 커밋모드가 auto(default) 일 때 Partition이 증가해 Rebalancing이 발생하면 커밋되지 않은 Message들은 자칫 컨슈머가 다시 Subscribe하여 중복처리할 수도 있다. 
+- 주문서비스와 배송서비스의 상세 모델을 참조하여 Query 모델(Materialized View)을 설계한다.
 
-#### Kafka 커밋모드 변경 
+#### SCENARIO
+- 고객센터팀이 신설되어 '마이페이지' 서비스를 런칭한다.
 
-- autoCommit 설정을 false로 변경하여 수동커밋 모드로 변경한다. 
+#### MODELING
+- customercenter BC 를 추가
+- Read Model 녹색 스티커 추가('MyPage')
+- Read Model 속성 Define
+> orderId 
+> productId
+> deliveryStatus
+> orderStatus
 
-- Product 마이크로서비스 application.yml 화일의 cloud.stream.kafka 하위의 설정을 주석해제하고 저장한다.
-```yaml
-bindings:
-  event-in:
-    consumer:
-      autoCommitOffset: false 
+<img width="982" alt="image" src="https://user-images.githubusercontent.com/487999/191055790-5d6a529f-e2f7-49ab-8ee0-74d371f06090.png">
+
+- Read Model CRUD 상세설계
+
+<img width="434" alt="image" src="https://user-images.githubusercontent.com/487999/191056403-fbdec62b-42ea-4261-8e4e-b631c6c6779a.png">
+
+
+
+#### Code Preview
+- 상세 설계가 끝난 View Model 코드를 리뷰한다.
+
+#### 실행
+- customer-center 에 오류가 발생한다면 다음 ViewHandler.java 부분의 구현체를 확인: (findByOrderId --> findById)
 ```
-- Order와 Product 마이크로서비스를 기동한다.
-```bash
-cd order
-mvn spring-boot:run
-```
-```bash
-cd product
-mvn spring-boot:run
-```
-> 현재, kafkatest 토픽의 파티션이 2개이므로, 실행한 Product 서비스 Console에 2개의 파티션이 할당되었음을 볼 수 있다.
-> partitions assigned: [kafkatest-0, kafkatest-1]
+    @StreamListener(KafkaProcessor.INPUT)
+    public void whenDeliveryStarted_then_UPDATE_1(@Payload DeliveryStarted deliveryStarted) {
+        try {
+            if (!deliveryStarted.validate()) return;
+                // view 객체 조회
+            Optional<MyPage> myPageOptional = myPageRepository.findById(deliveryStarted.getOrderId());
+
+            if( myPageOptional.isPresent()) {
+                 MyPage myPage = myPageOptional.get();
+            // view 객체에 이벤트의 eventDirectValue 를 set 함
+                myPage.setDeliveryStatus("Started");    
+                // view 레파지 토리에 save
+                 myPageRepository.save(myPage);
+                }
 
 
-#### Lag 확인 
-
-- Order 서비스에 포스팅하여 Kafka Event를 발행한다.
-```
-http POST :8081/orders message=1st-Order
-http POST :8081/orders message=2nd-Order
-```
-
-- Product 마이크로서비스는 메시지를 소모(처리)했음에도 불구하고 Partition에서의 OffSet이 증가하지 않아 Lagging이 발생하고 있다.
-- Partition Lagging 확인
-```sh
-$kafka_home/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group product --describe
-```
-
-#### Manual Commit 
-
-- Product 서비스에서 수동으로 ACK를 날려 Manual Commit을 해준다. 
-- Product 서비스의 PolicyHandler.java에서 아래 메서드의 블럭주석을 해제하고 기존 메서드를 블럭주석 처리한다. 
-
-```java
-@StreamListener(KafkaProcessor.INPUT)
-    public void wheneverOrderPlaced_PrintMessage(@Payload OrderPlaced orderPlaced, @Header(KafkaHeaders.ACKNOWLEDGMENT) Acknowledgment acknowledgment) {
-
-        System.out.println("Entering listener: " + orderPlaced.getId());
-        System.out.println("Entering listener: " + orderPlaced.getMessage());
-
-        acknowledgment.acknowledge();
-
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
-```
-- Product 마이크로서비스를 재시작한다. 
-- Console 로그를 조회하면 메시지가 재처리한 것이 확인된다.
-- Order 서비스에 포스팅하여 Kafka Event를 추가 발행한다.
-```
-http POST :8081/orders message=3rd-Order
-http POST :8081/orders message=4th-Order
-```
 
-#### Lag 확인 
-
-- - Partition Lagging을 재확인하면 이제는 Lagging이 확인되지 않는다.
-```sh
-$kafka_home/bin/kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group product --describe
 ```
-
+- 주문 1건을 등록한 후, MyPage 의 내용을 확인한다
+```
+http :8081/orders productId=1 qty=1
+http :8084/myPages
+```
+- 배송서비스를 기동한 후, MyPage 의 내용을 확인한다.
+- 배송서비스를 죽인 후, MyPage 의 내용을 확인하여도 서비스가 안정적임을 확인한다. 

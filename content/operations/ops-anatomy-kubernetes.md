@@ -7,6 +7,8 @@ next: ''
 
 # 쿠버네티스 내부구조 분석
 
+# 쿠버네티스 내부구조 분석
+
 ### Kubernetes Installation 
 #### Preparing a VM & Connect
 

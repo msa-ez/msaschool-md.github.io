@@ -7,6 +7,8 @@ next: ''
 
 # MSA 로깅 with EFK Stack
 
+# MSA 로깅 with EFK Stack
+
 ### 마이크로서비스 통합 로깅
 
 - EFK(Elasticsearch, Fluentd, Kibana) 스텍을 클러스터에 설치하여 마이크로서비스 로그를 중앙에서 통합 모니터링한다.

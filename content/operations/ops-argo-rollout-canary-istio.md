@@ -7,6 +7,8 @@ next: ''
 
 # [GitOps] Argo Rollout 와 Istio 를 통한 카나리 배포
 
+# [GitOps] Argo Rollout 와 Istio 를 통한 카나리 배포
+
 - ops-argo-rollout-canary-istio
 - [운영] Argo Rollout 와 Istio 를 통한 카나리 배포
 - Argo Rollout 과 Istio 의 Traffic Management 를 통하여 안정적인 카나리아 배포를 실습한다.
@@ -47,7 +49,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: nginx:1.15.4
+        image: jinyoung/app:blue
         ports:
         - containerPort: 80
   minReadySeconds: 30
@@ -59,9 +61,34 @@ spec:
       steps:
       - setWeight: 10
       - pause:
-          duration: 1h # 1 hour
+          duration: 1m # 1 
       - setWeight: 20
-      - pause: {} # pause indefinitely
+      - pause:
+          duration: 1m # 1 hour
+      - setWeight: 30
+      - pause:
+          duration: 1m # 1 hour
+      - setWeight: 40
+      - pause:
+          duration: 1m # 1 hour
+
+
+---
+
+  apiVersion: "v1"
+  kind: "Service"
+  metadata: 
+    name: "nginx"
+    labels: 
+      app: "nginx"
+  spec: 
+    ports: 
+      - 
+        port: 80
+        targetPort: 80
+    selector: 
+      app: "nginx"
+    type: "LoadBalancer"
 ```
 
 ## Argo CLI / Dashboard 의 설치
@@ -72,7 +99,7 @@ curl -LO https://github.com/argoproj/argo-rollouts/releases/download/v1.0.0-rc1/
 
 chmod +x ./kubectl-argo-rollouts-linux-amd64
 
-mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
 
 kubectl argo rollouts version  # 1.0.0 으로 확인되어야 함
 ```
@@ -88,19 +115,18 @@ Argo Dashboard 웹 서비스를 로컬에 올린다:
 kubectl argo rollouts dashboard
 ```
 
-MSA Easy 에서 열수있는 포트는 808x 대만 지원되므로 iptables 명령으로 포트포워딩 한다:
-```
-iptables -A PREROUTING -t nat -i eth0 -p tcp --dport 8080 -j REDIRECT --to-port 3100
-```
-> iptables 설치:
-> apt-get update
-> apt-get install iptables
-
-Labs > 포트열기 > 8080 으로 대시보드를 열어 접속해본다.
-
 ![Argo Dashboard](https://argoproj.github.io/argo-rollouts/dashboard/rollouts-list.png)
 
-
+argo rollout 으로 배포를 실시한다:
+```
+kubectl argo rollouts set image example-rollout  nginx=jinyoung/app:blue
+```
+- Argo Rollout Dashboard 를 통하여 배포가 진행되는 과정을 살펴본다
+- 브라우저를 통하여 배포된 서비스의 주소로 접속, 배포 과정에서 실제 서비스의 접속시 배경색이 흰색(nginx:1.19.x)에서 푸른색(jinyoung/app:blue)으로 교차되는 것을 확인한다.
+- 브라우저 리프래시가 힘들면 다음과 같이 watch 명령을 통하여 html 이 교차하면서 변경됨을 확인:
+```
+watch http <Rollout 서비스의 EXTERNAL IP>
+```
 # Istio 를 통한 카나리 배포
 다음의 Rollout 은 Virtual Service 의 Traffic 배분을 매 10초 간격으로 조정하면서 카나리 배포를 실시한다:
 ```
@@ -255,7 +281,7 @@ kubectl argo rollouts set image rollout-order order=nginx
 kubectl argo rollouts undo rollout-order
 
 # 다시반영 (빠르게 - 카나리 off)
-kubectl argo rollouts set image rollout-order order=jinyoung/app:blue --full
+kubectl argo rollouts set image rollout-order order=jinyoung/app:blue
 kubectl argo rollouts promote rollout-order --full
 
 # 다시 롤백 (빠르게 - 카나리 off)
@@ -268,6 +294,17 @@ kubectl argo rollouts promote rollout-order --full
 ```
 kubectl argo rollouts get rollout rollout-order --watch
 
+```
+
+서비스를 접속확인 하기 위해서 istio-ingress 주소를 얻어서 watch 로 변화를 확인한다:
+
+```
+kubectl get svc istio-ingressgateway -n istio-system
+```
+얻어낸 external ip 뒤에 "/orders" 를 넣어서 watch 한다:
+
+```
+watch http [istio-ingressgateway external ip]/orders
 ```
 
 참고기사:  https://dev.to/stack-labs/canary-deployment-with-argo-cd-and-istio-406d

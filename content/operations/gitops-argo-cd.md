@@ -7,6 +7,8 @@ next: ''
 
 # [GitOps] Argo CD 를 통한 카나리 배포
 
+# [GitOps] Argo CD 를 통한 카나리 배포
+
 # Argo CD 를 통한 배포
 
 Argo CD 의 홈페이지를 방문한다:

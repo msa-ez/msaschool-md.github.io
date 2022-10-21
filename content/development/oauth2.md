@@ -5,98 +5,199 @@ prev: ''
 next: ''
 ---
 
-# JWT토큰 기반 인증인가 w/ Spring Authz-svr
+# Req/Res 방식의 MSA 연동 (New)
 
-### Gateway에서의 JWT 토큰기반 인증
+# Req/Res 방식의 MSA 연동 (New)
 
-#### 인증,인가에 대한 자세한 내용은 MSASchool에서 확인할 수 있다.
-http://msaschool.io/operation/design/design-seven/
+### Monolith 서비스의 동작 구조 확인
 
-- Spring Security와 Spring oauth2를 사용해 Resource Owner, Client, Authorization Server, Resource Server간의 인증/인가를 실습한다.
-- 여기서 Resouce란 Gateway를 경유하는 Rest APIs 들이며, Gateway가 Client 이자 Resource Server 역할을 한다. 
-- JWT기반 Access_Token을 활용한다.
+모노리스 기반 쇼핑몰 서비스에서 inventory 서비스를 분리하고, Feign Client 를 사용해 모노리식 쇼핑몰과 분리된 마이크로서비스 분리하는 Lab 이다.  
+Feign Client 는 기존의 로컬 객체 인터페이스를 준수하면서 실제적으로는 원격 호출(Request/Response) 방식으로 서비스간의 통신을 가능하게 하여 레가시 코드의 변경을 최소화 하여 transform하는 방법이다.
 
-#### gateway 서비스에서 리소스서버 설정
-- 게이트웨이 서비스의 ResourceServerConfiguration.java 파일을 열어본다.
-- spring-cloud-gateway 는 webflux로 기동되기 때문에 @EnableWebFluxSecurity 를 적용한다.
-- ServerHttpSecurity 생성시, oauth2ResourceServer() 리소스 서버역할을 부여하고 .jwt() 를 선언해 jwt 형식의 Authorization을 지정한다.
-- 인증/인가를 위한 Url은 JWK(Json Web Key)로 정의해 application.yaml에 선언되어 있다.
 
-```yaml
-
-spring:
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8090/.well-known/jwks.json
+- monolith 서비스 기동
 ```
-
-- 8090 포트의 서버는 인증(oauth) 서버이다. 인증서버에서 인증 Url인 jwks.json 엔드포인트가 GetMapping으로 선언되어 있다.
-> JwkSetEndpointConfiguration.java
-- Gateway 서비스(Client)는 인증서버에 uengine-client:uengine-secret 정보로 등록되어 있다.
-> OAuth2AuthorizationServerConfig.java
-
-#### 서비스 구동
-
-- 게이트웨이 서비스와 일반 마이크로 서비스인 order 서비스를 실행한다.
-```sh
-cd gateway
+cd monolith
 mvn spring-boot:run
-cd order
+
+http localhost:8081
+``` 
+- Order.java 에서 inventory 로컬 객체를 통해 재고처리 중임을 확인:
+```
+
+    @PostPersist
+    public void onPostPersist() {
+        inventoryService().decreaseStock(Long.valueOf(getProductId()), new DecreaseStockCommand(getQty()));
+
+    }
+
+    @PrePersist
+    public void checkAvailability(){
+        if(inventoryService().getInventory(Long.valueOf(getProductId())).getStock() < getQty()) throw new RuntimeException("Out of stock");
+    }
+
+    public static InventoryService inventoryService(){
+        InventoryService inventoryService = MonolithApplication.applicationContext.getBean(
+            InventoryService.class
+        );
+
+        return inventoryService; // 여기에 breakpoint 설정
+    }
+
+
+```
+
+- Order.java의 inventoryService() 메서드에 디버그 포인트 설치
+- "return inventoryService;" 라인의 라인번호 앞을 클릭하면, 빨간색의 원(breakpoint)이 나타남
+ 
+- 주문 발송  
+```
+http localhost:8081/orders productId=1 quantity=3 customerId="1@uengine.org" customerName="hong" customerAddr="seoul"
+```
+
+- InventoryServiceImpl.java 를 통해서 처리가 되는 Monolith 임을 확인.
+
+### 기존 Monolith에서 일부 영역을 마이크로서비스로 분리
+
+#### 이벤트스토밍
+- bounded context 를 추가하고 이름을 "inventory"로 설정
+- inventory aggregate 객체들을 묶음 선택하여 inventory bounded context 내로 이동
+
+<img width="874" alt="image" src="https://user-images.githubusercontent.com/487999/190896320-72973cf1-c1dc-44f4-a46a-9be87d072284.png">
+
+- 재고량을 감소시키는 Command 의 추가: inventory BC 내에 Command  스티커를 추가하고, 이름을 "decrease inventory" 로 부여. 이때 Command 스티커는 Inventory Aggregate 스티커의 왼쪽에 인접하게 부착.
+- Command 의 설정:  "decrease inventory" command 를 더블클릭한후, "Controller" 를 선택. Attribute로 name: qty, type: Integer 를 추가.
+
+<img width="784" alt="image" src="https://user-images.githubusercontent.com/487999/190896393-30889e96-6cbc-4e7f-9631-25c0d004635d.png">
+
+- 원격 호출선 연결:  monolith 내의 OrderPlaced Event 스티커와 inventory 의 decrease inventory Command 스티커를 연결. 이때 Req/res 라는 표시가 나타남.
+
+<img width="859" alt="image" src="https://user-images.githubusercontent.com/487999/190896427-f91962cd-f8ab-4113-bd85-5abe1ada3bcd.png">
+
+#### 호출측 코드 확인과 구현
+- monolith 내에 잔존하는 inventory 관련 코드들을 모두 삭제한다 (Inventory.java, InventoryService.java, InventoryRepository.java, InventoryServiceImpl.java)
+- 이벤트 스토밍 결과 코드를 생성하고 push 한 후, Code 를 update 한다.
+- monolith/../ Order.java 의 @PostPersist 내에 호출을 위해 생성된 샘플코드를 확인하고 //here 부분과 같이 수정한다:
+```
+    @PostPersist
+    public void onPostPersist() {
+        //Following code causes dependency to external APIs
+        // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
+
+        labshopmonolith.external.DecreaseStockCommand decreaseStockCommand = new labshopmonolith.external.DecreaseStockCommand();
+        decreaseStockCommand.setQty(getQty()); //here
+        
+        // mappings goes here
+        MonolithApplication.applicationContext
+            .getBean(labshopmonolith.external.InventoryService.class)
+            .decreaseStock(Long.valueOf(getProductId()), decreaseStockCommand); //here
+
+        OrderPlaced orderPlaced = new OrderPlaced(this);
+        orderPlaced.publishAfterCommit();
+    }
+
+
+```
+> 우리는 decreaseStock stub 메서드를 로컬 객체를 호출하는것처럼 호출하지만 실제적으로는 inventory 원격객체를 호출하는 결과가 될 것이다.
+> 재고량 수정을 위하여 qty 값을 전달하는 Command 객체와 해당 제품 id 를 path 로 전달하는 첫번째 아규먼트로 productId를 전달한다.
+
+
+- monolith/../ external 패키지 내에 생성된 FeignClient 관련 Stub 코드들을 참고한다 (InventoryService.java, DecreaseStockCommand.java, Inventory.java)
+```
+@FeignClient(name = "inventory", url = "${api.url.inventory}")
+public interface InventoryService {
+    @RequestMapping(
+        method = RequestMethod.PUT,
+        path = "/inventories/{id}/decreasestock"
+    )
+    public void decreaseStock(
+        @PathVariable("id") Long id,
+        @RequestBody DecreaseStockCommand decreaseStockCommand
+    );
+
+}
+```
+> FeignClient 는 실제로는 inventory 원격객체를 호출하는 proxy 객체를 생성할 것이다. application.yaml 의 api.url.inventory 설정값의 url 로 PUT 메서드를 해당 path 로 호출하는 원격 호출의 구현체가 채워진다. 
+
+#### 피호출측 소스코드의 확인과 구현
+- inventory/.. /infra/InventoryController.java
+```
+public class InventoryController {
+
+    @Autowired
+    InventoryRepository inventoryRepository;
+
+    @RequestMapping(
+        value = "inventories/{id}/decreasestock",
+        method = RequestMethod.PUT,
+        produces = "application/json;charset=UTF-8"
+    )
+    public Inventory decreaseStock(
+        @PathVariable(value = "id") Long id,
+        @RequestBody DecreaseStockCommand decreaseStockCommand,
+        HttpServletRequest request,
+        HttpServletResponse response
+    ) throws Exception {
+        System.out.println("##### /inventory/decreaseStock  called #####");
+        Optional<Inventory> optionalInventory = inventoryRepository.findById(
+            id
+        );
+
+        optionalInventory.orElseThrow(() -> new Exception("No Entity Found"));
+        Inventory inventory = optionalInventory.get();
+        inventory.decreaseStock(decreaseStockCommand);
+
+        inventoryRepository.save(inventory);
+        return inventory;
+    }
+}
+```
+> decreaseStock 에 대한 원격호출을 받을 수 있는 REST Service Mapping 이다.
+> 호출을 받으면 Inventory 어그리거트의 decreaseStock 으로 전달하는 input adapter 역할을 한다(hexagonal architecture). 실제 비즈니스 로직 (재고량 감소)은 어그리거트 내부에서만 ubiquitous 언어로 구현되어야 한다.
+
+- inventory/../Inventory.java 의 구현
+```
+    public void decreaseStock(DecreaseStockCommand decreaseStockCommand) {
+        setStock(getStock() - decreaseStockCommand.getQty().longValue());
+    }
+
+```
+
+#### inventory 서비스의 테스트
+
+- inventory 서비스를 기동시키고 httpie 툴을 통하여 서비스가 잘 호출되는지 테스트한다:
+```
+cd inventory
 mvn spring-boot:run
 ```
-- 8081 로 기동된 order 서비스를 바로 접근해 본다. (접근됨)
-	- http localhost:8081/orders
+- 서비스 기동 후, "could not be established. Broker may not be~.." 오류가 발생한다.
+- 메시징 브로커인 Kafka가 실행되고 있지 않아서 발생하는 접속 오류이다.
+- 새로운 터미널에서 Kafka 서버를 기동한다.
+```
+cd kafka
+docker-compose up
+```
 
-- 8088 로 기동된 gateway 서비스를 통하여 접근해 본다. (401 Unauthorized)
-	- http localhost:8088/orders
+- 새 터미널에서 테스트 전, http Client를 먼저 설치한다.
+```
+pip install httpie
+```
+- 인벤토리에 테스트할 상품을 먼저 등록하고 사전 검증한다.
+```
+http :8082/inventories id=1 stock=10
+http PUT :8082/inventories/1/decreasestock qty=3
+http :8082/inventories/1  # stock must be 7
+```
 
-#### oauth 서버에서 토큰 발급
-- 토큰을 발급하려면, 사용자가 있어야 한다.
-- oauth 서비스의 AuthorizationServerApplication.java 에서 초기 사용자username="1@uengine.org" / password = "1" 로 사전 등록되어 있다.
+#### monolith 를 통하여 inventory 호출 테스트
 
-#### OAuth 인증서버  구동
-- 인증 서버를 실행한다.
-```sh
-cd oauth
+- monolith 를 기동시키고 실제 주문을 통하여 inventory 가 호출되는지 확인한다:
+
+```
+cd monolith
 mvn spring-boot:run
+
+#새 터미널
+http :8081/orders productId=1 qty=5
+http :8082/inventories/1  # stock must be 2
 ```
-- 서버를 실행 후, 토큰을 요청하는 API(/oauth/token) 를 호출하여 토큰을 가져온다.
-	- 이때 Basic 뒤의 base64 값은 인증서버에 등록된 Gateway의 인코딩된 CLIENT_ID:CLIENT_SECRET 정보이다.
-   ```
-    http --form POST localhost:8088/oauth/token "Authorization: Basic dWVuZ2luZS1jbGllbnQ6dWVuZ2luZS1zZWNyZXQ=" grant_type=password username=1@uengine.org password=1
-   ```
-- 출력된 access_token을 복사하여 https://jwt.io/ 페이지에 접속 후 decode해 본다.
-> Header, Payload, Signature로 파싱된다.	
-
-- 가져온 데이터의 "access_token": 부분이 토큰 정보이다. 이 토큰을 이용하여 게이트웨이를 통하여 주문 서비스를 조회한다.
-    ```
-    export access_token=[TOKEN입력]
-    echo $access_token
-    http localhost:8088/orders "Authorization: Bearer $access_token"
-    ```
-	- $access_token 부분에 넘어온 토큰 정보를 입력한다.
-	- 토큰정보를 일부러 틀리게 하여 호출하여 본다.  
-
-- 토큰이 유효한지 체크하여 본다
-	- http --form POST localhost:8088/oauth/check_token token=$access_token
-	- 토큰정보를 일부러 틀리게 하여 호출하여 본다.  
-	```
-	{
-	    "error": "invalid_token",
-	    "error_description": "Invalid access token"
-	}
-	```
-
-#### Service Clear
-- 다음 Lab을 위해 기동된 모든 서비스 종료
-
-```
-fuser -k 8081/tcp
-fuser -k 8088/tcp
-fuser -k 8090/tcp
-```
-
-#### 상세설명
-<iframe width="100%" height="100%" src="https://www.youtube.com/embed/dsUW_JTvqIA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>

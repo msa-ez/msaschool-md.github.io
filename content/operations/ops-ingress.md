@@ -7,6 +7,8 @@ next: ''
 
 # Ingress 를 통한 진입점 통일 - Path-based routing
 
+# Ingress 를 통한 진입점 통일 - Path-based routing
+
 ## Ingress
 
 ### Ingress 의 설정

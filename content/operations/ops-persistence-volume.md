@@ -9,14 +9,17 @@ next: ''
 
 ## 주문 서비스에 Database 설정의 변경
 > 데이터베이스 설정이 이루어진 order project 를 다운로드 받는다
+
 ```
 cd ~
 git clone https://github.com/event-storming/monolith
 
 cd monolith
 ```
+
 Dockerfile-prod 를 Dockerfile 로 바꾼다.
 기존 Dockerfile 삭제.
+
 ```
 rm Dockerfile
 mv Dockerfile-prod Dockerfile
@@ -24,6 +27,7 @@ mv Dockerfile-prod Dockerfile
 
 빌드하여 order:database 라는 이미지명으로 레지스트리에 등록한다
 e.g. (도커허브경우)
+
 ```
 mvn package -B 
 
@@ -40,6 +44,7 @@ az acr build --registry user27 --image user27.azurecr.io/order:database .
 order 서비스의 Database 설정을 아래와 같이 변경하므로써, 외부의 데이터베이스에 접근 가능하게 된다:
 
 application.yml (or application-prod.yml)
+
 ```
 spring:
   jpa:
@@ -104,14 +109,18 @@ spec:
 kubectl get po # pod 명 확인
 kubectl logs <pod 명>
 ```
+
 로그 내용중:
+
 ```
 Caused by: java.net.UnknownHostException: mysql: Name does not resolve
 ```
+
 우리가 제공한 DB server 의 주소를 환경변수로 잘 받아왔고 (mysql), 그 주소로 접근을 시도했으나 서비스가 올라있지 않으므로 발생하는 오류이다.
 
 
 값을 위와 같이 Deployment 설정에 직접 입력하는것은 개발자와 운영자사이에 역할이 혼재되므로, 운영자가 해당 설정 부분만을 관리할 수 있도록 별도의 Configuration 을 위한 쿠버네티스 객체인 ConfigMap (혹은 Secret)을 선언하여 연결할 수 있다. 여기서는 패스워드가 노출되면 안되므로 PASSWORD 에 대해서만 Secret 을 이용하여 분리해준다:
+
 ```
 apiVersion: v1
 kind: Secret
@@ -121,9 +130,11 @@ type: Opaque
 data:
   password: YWRtaW4=     
 ```
+
 > "YWRtaW4="는  'admin' 문자열의 BASE64 인코딩된 문자열이다.   "echo -n 'admin' | base64" 명령을 통해 생성가능하다.
 
 Secret 객체의 내용을 기존 deployment.yaml 에 추가하고:
+
 ```
 $ kubectl apply -f deployment.yaml
 
@@ -131,6 +142,7 @@ secret/mysql-pass created
 ```
 
 생성된 secret 을 확인한다:
+
 ```
 $ kubectl get secrets
 
@@ -165,6 +177,7 @@ mysql-pass            Opaque                                1      1m
 주문 서비스를 위한 데이터베이스로 MySQL 을 사용하기로 한다. MySQL 이미지명으로 간단하게 Pod 하나를 생성한다. 
 
 MySQL 을 위한 Pod 설치:
+
 ```
 apiVersion: v1
 kind: Pod
@@ -195,6 +208,7 @@ spec:
 ```
 
 생성된 yaml 을 deployment.yaml 에 추가한후:
+
 ```
 $ kubectl apply -f deployment.yaml
 
@@ -202,6 +216,7 @@ pod/k8s-mysql created
 ```
 
 Pod 실행을 확인한다:
+
 ```
 $ kubectl get pod
 
@@ -240,6 +255,7 @@ mysql> exit
 ```
 
 주문 마이크로 서비스를 쿠버네티스 DNS 체계내에서 접근가능하게 하기 위해 ClusterIP 로 서비스를 생성해준다. 주문 서비스에서 mysql 접근을 위하여 "mysql"이라는 도메인명으로 접근하고 있으므로, 같은 이름으로 서비스를 만들어준다:
+
 ```
 apiVersion: v1
 kind: Service
@@ -257,6 +273,7 @@ spec:
     name: lbl-k8s-mysql
   type: ClusterIP
 ```
+
 > 마찬가지 위의 내용을 deployment.yaml 에 추가하고 kubectl apply -f deployment.yaml 
 > 앞으로 계속 마찬가지!
 
@@ -266,6 +283,7 @@ spec:
 kubectl get po -l app=order
 kubectl delete po [order-po-name]
 ```
+
 이렇게 잘 접속이 된다면 다음의 로그를 확인할 수 있다:
 
 ```
@@ -302,11 +320,13 @@ Hibernate:
 ## 주문 걸어보기
 
 httpie pod 에 들어가서 주문을 걸어준다:
+
 ```
 kubectl exec -it httpie /bin/bash 
 
 root@httpie:/# http order:8080/orders productId=1 customerId="jjy"
 ```
+
 > 위의 'order' 도메인 주소로 접근이 되도록 하려면 order 를 위한 Service (이름 order) 객체가 꼭 만들어져 있어야 한다.
 
 ```
@@ -326,6 +346,7 @@ spec:
   type: "ClusterIP"
 
 ```
+
 > order 라는 도메인 주소로 호출이 되려면 order 와 같은 클러스터내부에서 호출해야 한다. 그러려면 httpie pod 를 만들어서 order 와 같은 네임스페이스 (default) 내에 httpie pod 가 생성되어있어야 한다.
 > httpie pod 를 만들기:
 
@@ -353,6 +374,7 @@ EOF
 > httpie pod 를 만들기 귀찮다면.. kubectl port-forward deploy/order 8085:8080 를 해놓은 후, localhost:8085 번으로 호출해도 된다. 
 
 주문 마이크로 서비스의 데이터가 설치한 MySQL을 통하여 보존되는 것을 확인한다. 
+
 ```
 mysql> use orderdb
 Reading table information for completion of table and column names
@@ -408,6 +430,7 @@ spec:
     persistentVolumeClaim:
       claimName: "fs"
 ```
+
 변경후 apply 를 해주고 기다려보면 해당 Pod 는 Pending 상태에 잠기게 된다. 이유는 해당 Pod 를 위한 fs 라는 PVC가 생성되지 않았기 때문이다.
 
 우리는 저 "fs" 라고 하는 PVC 를 플랫폼(애져 or AWS등)의 파일 서비스에서 만들어와야 한다.
@@ -415,6 +438,7 @@ spec:
 ### PVC 생성
 PersistentVolumeClaim - PVC 를 생성하는 방법은 간단하다. 기본으로 장착된 gp2라고 하는 StorageClass 를 통해서 얻을 수 있기 때문이다.
 아래와 같은 yaml 을 설정한 후, kubectl get pvc 를 통해 PVC가 생성되는 것을 확인한다. 
+
 ```
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -432,10 +456,12 @@ spec:
 
 PVC가 생성되면, mysql pod 의 pending 이 해제될 것이다. 
 > Volume mount 에 대한 설정변경은 그냥 apply 만 해서는 반영이 될 수 없다는 오류가 발견될 것이다. 이를 해결하기 위해서는 완전히 기존 mysql 설정을 삭제한 후 다시 기동해주어야 한다: 
+
 ```
 kubectl delete -f deployment.yaml
 kubectl apply -f deployment.yaml
 ```
+
 > 다시 기동후에는 orderdb 테이블 스페이스를 다시 만들어주어야 한다.
 
 그런후에 PVC 상태를 확인:
@@ -451,6 +477,7 @@ aws-ebs         Bound     pvc-225ebe47-cc67-4985-8f94-c0d4d795dede   1Gi        
 주문 한건을 걸어본 후,
 
 mysql pod 를 삭제하고,
+
 ```
 kubectl delete pod mysql
 kubectl apply -f deployment.yaml

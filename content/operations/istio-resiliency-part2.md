@@ -29,6 +29,8 @@ kubectl apply -f - << EOF
   spec:
     host: delivery
     trafficPolicy:
+      loadBalancer:
+        simple: ROUND_ROBIN		
       outlierDetection:
         consecutive5xxErrors: 1
         interval: 1s
@@ -72,10 +74,4 @@ http http://delivery:8080/actuator/echo
 
 #### Kiali를 통한 Circuit Breaker 확인
 
-- 모니터링 시스템(Kiali)에 접속하여 (http://Kiali EXTERNAL-IP:20001)배송서비스 Circuit Breaker 배지(Badge) 확인
-
-> Kiali 가 LoadBalancer로 노출되어있지 않다면
-```
-kubectl patch svc kiali -n istio-system -p '{"spec": {"type": "LoadBalancer"}}'
-
-```
+- 모니터링 시스템(Kiali)에 접속하여 (kiali.service.com/kiali)배송서비스 Circuit Breaker 배지(Badge) 확인

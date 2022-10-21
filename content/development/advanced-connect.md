@@ -5,190 +5,103 @@ prev: ''
 next: ''
 ---
 
-# Kafka Connect
+# Contract Test (Consumer Driven Test)
 
-### Kafka Connect 
+# Contract Test (Consumer Driven Test)
 
-- Kafka Connect를 이용한 CDC(Change Data Capture)를 통해 데이터 동기화를 실습한다. 
-- Connect는 Connector를 실행시켜주는 서버로 DB동기화시, 벤더사가 만든 Connector, 또는 OSS(Debezium, Confluent) 계열의 Connector를 사용한다. 
-- Lab에서는 경량의 h2 DB를 사용한다.
+### contract test 실습
 
-#### Connector, H2 database 다운로드 
-- H2 DB와 Kafka Connect를 위한 JDBC 드라이브를 다운로드한다.
+#### contract test 시나리오
+- 서비스 정상 작동 확인
+- 상품서비스(8085)와 주문서비스(8081)를 각각 콘솔을 열어 기동한다.
+```sh	
+cd contract-test
 
-```sh
-git clone https://github.com/acmexii/kafka-connect.git
-cd kakka-connect
-```
-- h2-database 아카이브를 압축해제한다.
-```sh
-unzip h2.zip
-```
-
-#### H2 데이터베이스 실행
-- bin 폴더로 이동해 h2 database를 서버모드로 실행한다. 
-
-```sh
-cd bin
-chmod 755 h2.sh
-./h2.sh -webPort 8087 -tcpPort 9099
-```
-- 지정한 webPort로 Client WebUI가 접근가능하며,  h2 database는 9099포트(default 9092)로 실행된다. 
-
-#### Kafka JDBC Connector 설치
-
-- Jdbc Connector는 설치된 Kafka 서버에 등록하고 사용한다.
-- Connector를 설치할 폴더를 생성한다.
-
-```sh
-cd $kafka_home
-mkdir connectors
-cd connectors
-```
-- 다운받은 confluentinc-kafka-connect-jdbc-10.2.5.zip을 복사 후 unzip 한다. 
-
-```sh
-cp /home/project/advanced-connect/kafka-connect/confluentinc-kafka-connect-jdbc-10.2.5.zip ./
-unzip confluentinc-kafka-connect-jdbc-10.2.5.zip
-```
-
-#### Connect 서버에 Connector 등록
-- kafka Connect에 설치한 Confluent jdbc Connector를 등록한다.
-
-- $kafka_home/config 폴더로 이동 후 connect-distributed.properties 파일 오픈하고,
-```sh
-cd $kafka_home/config 
-vi connect-distributed.properties
-```
-- 마지막 행을 plugin.path=/usr/local/kafka/connectors 로 편집하고 저장종료한다. 
-
-#### Kafka Connect 실행 
-
-- $kafka_home에서 connect를 실행한다. 
-```sh
-cd $kafka_home
-bin/connect-distributed.sh config/connect-distributed.properties
-```
-
-- Kafka Connect는 default 8083 포트로 실행이 된다. 
-- Labs > 포트확인 메뉴를 통해 실행중 서비스를 확인한다.
-```sh
-root@labs-315390334:/home/project# netstat -lntp | grep :808 
-tcp        0      0 0.0.0.0:8083            0.0.0.0:*               LISTEN      23597/java          
-tcp        0      0 0.0.0.0:8087            0.0.0.0:*               LISTEN      21885/java          
-root@labs-315390334:/home/project# 
-```
-
-- Kafka topic을 확인해 본다.
-```sh
-/usr/local/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-````
-- Connect를 위한 토픽이 추가되었다.
-> connect-configs, connect-offsets, connect-status
-
-
-#### Source Connector 설치 
-
-- Kafka connect의 REST API를 통해 Source 및 Sink connector를 등록한다. 
-
-```curl 
-curl -i -X POST -H "Accept:application/json" \
-    -H  "Content-Type:application/json" http://localhost:8083/connectors/ \
-    -d '{
-    "name": "h2-source-connect",
-    "config": {
-        "connector.class": "io.confluent.connect.jdbc.JdbcSourceConnector",
-        "connection.url": "jdbc:h2:tcp://localhost:9099/./test",
-        "connection.user":"sa",
-        "connection.password":"passwd",
-        "mode":"incrementing",
-        "incrementing.column.name" : "ID",
-        "table.whitelist" : "ORDER_TABLE",
-        "topic.prefix" : "CONNECT_",
-        "tasks.max" : "1"
-    }
-}'
-```
-> Connector 등록시, 'No suitable driver' 오류가 발생할 경우, Classpath에 h2 driver를 설정해 준다.
-> h2/bin에 있는 JDBC 드라이브를 $kafka_home/lib에 복사하고 다시 Connect를 실행한다. 
-
-- 등록한 Connector를 확인한다.
-```sh
-http localhost:8083/connectors
-```
-
-#### Order 마이크로서비스 설정
-- 주문 서비스를 서버모드로 실행한 h2 Database에 연결한다.
-- Order의 application.yml을 열어 default profile의 datasource를 수정한다.
-```yaml
-  datasource:
-    url: jdbc:h2:tcp://localhost:9099/./test
-    username: sa
-    password: passwd
-    driverClassName: org.h2.Driver
-```
-
-
-#### 소스 테이블에 Data 입력 
-- order 마이크로서비스를 기동하고 소스 테이블에 데이터를 생성한다.
-
-```bash
-cd order
+cd orders
+mvn clean
 mvn spring-boot:run
-http POST :8081/orders message="1st OrderPlaced."
-http POST :8081/orders message="2nd OrderPlaced."
-```
 
-- Kafka topic을 확인해 본다.
-```sh
-/usr/local/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
-````
-- 'CONNECT_ORDER_TABLE' 토픽이 추가되어 목록에 나타난다.
-> Kafka Connect는 테이블 단위로 토픽이 생성되어 Provider와 Consumer간 데이터를 Sync합니다. 
-```
-$kafka_home/bin/kafka-console-consumer.sh --bootstrap-server 127.0.0.1:9092 --topic CONNECT_ORDER_TABLE --from-beginning
-```
-
-#### Sink Connector 설치 
-
-```curl 
-curl -i -X POST -H "Accept:application/json" \
-    -H  "Content-Type:application/json" http://localhost:8083/connectors/ \
-    -d '{
-    "name": "h2-sink-connect",
-    "config": {
-        "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
-        "connection.url": "jdbc:h2:tcp://localhost:9099/./test",
-        "connection.user":"sa",
-        "connection.password":"passwd",
-        "auto.create":"true",       
-        "auto.evolve":"true",       
-        "delete.enabled":"false",
-        "tasks.max":"1",
-        "topics":"CONNECT_ORDER_TABLE"
-    }
-}'
-```
-
-#### 타겟 테이블 Data 확인 
-
-- Sync대상 테이블을 조회한다.
-
-```bash
-cd order
+cd products
+mvn clean
 mvn spring-boot:run
-http GET :8081/syncOrders 
 ```
 
-> Sink Connector를 통해 syncOrders 테이블에 복제된 데이터가 조회된다
-
-- 다시한번 Orders 테이블에 데이터를 입력하고 확인해 본다.
-```bash
-http POST :8081/orders message="3rd OrderPlaced."
-http GET :8081/syncOrders
+- 주문을 한다.
+```	
+http http://localhost:8081/orders productId=2 quantity=3 customerId=1@uengine.org
 ```
 
-#### 이기종간 DBMS 연계
-- Sink Connector의 JDBC  Url만 다른 DB정보로 설정하면, 이기종 DB간에도 데이터가 동기화가 가능하다.
+- 계약(Contract) 위반 사항 만들기
+	- 주문서비스에서 주문을 할때, 상품서비스의 api 를 호출한다.
+		- Order.java 파일(45행)의 restTemplate.getForEntity 확인
+		- http://상품서비스/product/productId
+
+- 상품서비스에서 해당 api 를 item 으로 변경한다.
+> - 상품서비스의 ProductController.java 확인
+> - 15행에서 @GetMapping("/product/{productId}") 을
+> - @GetMapping("/item/{productId}") 으로 변경
+
+- 상품서비스를 재시작 하고 주문해 본다.
+
+```
+http http://localhost:8081/orders productId=2 quantity=3 customerId=1@uengine.org
+```
+- 404 에러 발생!!
+
+#### CDC(Consumer Driven Contract) 계약 체결
+- Consumer가 참조하는 코드를 Provider 일방적인 수정방지를 위한 Contract 적용
+- Consumer인 주문 서비스 개발자가 주도적으로 계약서를 작성(CDC)한다.
+- order 서비스의 최상위 root 에 productGet.groovy 파일 참고
+- productGet.groovy 파일을 복사하여서, product 서비스의 test/resources/contracts/rest 폴더에 복사를 한다.
+> - 실제로는 Git 환경에서 PR(Pull Request)을 요청하고 이를 상품팀이 수락한다.
+> - (contracts/rest 폴더는 없기때문에 새로 만들어야 합니다.)
+> - (contracts/rest 폴더를 만드는 이유는 productGet.groovy 파일에 package contracts.rest 라고 선언했기 때문입니다.)
+
+- 계약에 의해서 product 서비스에서 Test, or Package 실행단계에서 에러가 발생한다.
+- product 서비스의 package 명령을 호출한다.
+```sh
+cd products
+mvn package
+```
+- test fail 에러 발생!!
+> Consumer와 체결한 계약(Contract)을 위반하여 상품팀에서는 빌드단계에서부터 실패하게 된다. 
+
+- 계약 위반을 해결하기 위하여 product 서비스는 기존의 /product 라는 api 를 유지 해야한다..
+-  product 서비스의 ProductController.java 에서 
+
+```
+   @GetMapping("/v2/item/{productId}")
+    Product productStockCheck_v2(@PathVariable(value = "productId") Long productId) {
+        return productStockCheck(productId);
+    }
+
+    @GetMapping("/product/{productId}")
+    Product productStockCheck(@PathVariable(value = "productId") Long productId) {
+
+        return  this.productService.getProductById(productId);
+    }
 
 
+```
+위의 같이 기존 API를 준수하면서 신규 API 추가할 수 있도록 변경한다.
+	- product 서비스의 package 명령을 호출하여 봅니다.
+```sh
+cd products
+mvn package
+```
+- 테스트 성공 및 jar 파일 생성 완료!!
+
+#### 주문서비스에서 테스트
+- 주문서비스는 상품서비스에서 정상적으로 테스트를 적용하여 배포중인지 테스트를 할 수 있다.
+- 주문서비스가 상품서비스의 api 를 테스트 하기 위해서는 상품서비스에서 stub 파일을 제공해 주어야 한다.
+	- 상품 서비스에서 mvn install 을 하여 stub 파일을 Local(.m2 folder)에 생성한다.
+```sh
+cd products
+mvn install
+```
+
+
+- 주문서비스에서는 만들어진 stub 파일(Mock Server)을 바라보며 테스트를 진행한다.
+	- order 서비스의 test/java/com.example.template/ProductContractTest.java 파일참고
+	- @AutoConfigureStubRunner 에서 주문서비스의 stub 을 바라본다.
+	- TestRestTemplate 으로 "/product/1" api 를 호출하여 결과값을 비교한다.

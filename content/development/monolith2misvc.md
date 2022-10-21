@@ -5,108 +5,117 @@ prev: ''
 next: ''
 ---
 
-# [구현] Req/Res 방식의 MSA 연동
+# Kafka Retry & Dead Letter Queue (New)
 
-### 모노리식 서비스에서 일부 서비스를 마이크로서비스로 전환
+# Kafka Retry & Dead Letter Queue (New)
 
-모노리스 기반 쇼핑몰 서비스에서 배송 서비스를 분리하고, Feign Client 를 사용해 모노리식 쇼핑몰과 분리된 배송 마이크로서비스 분리하는 Lab 이다.  
-Feign Client 는 동기(Request/Response) 방식으로 서비스간의 통신을 가능하면 레가시 코드의 변경을 최소화 하여 트랜스폼하는 방법이다.
+### Retry & DLQ 
 
+#### Kafka Retry 
 
-- monolith 서비스 기동 확인 (8081 port)  
-    - http localhost:8081
- 
-- Order.java 에서 deliveryService 로컬 객체를 통해 배송처리 중임을 확인:
+- Consumer가 message를 처리하던 중 오류가 발생하면 해당 Message를 다시 Polling하여 처리해야 한다. 
+- 이를 Retry라고 하며, 간단하게 Kafka 설정으로 동작할 수 있다. 
+
+- Inventory 마이크로서비스 application.yml 의 cloud.stream.bindings.event-in 하위의 설정을 주석해제하고 저장한다.
+```sh
+bindings:
+  event-in:
+    group: product
+    destination: kafkatest
+    contentType: application/json
+    consumer:
+      max-attempts: 3
+      back-off-initial-interval: 1000
+      back-off-max-interval: 1000
+      back-off-multiplier: 1.0
+      defaultRetryable: false  
 ```
-  @PostPersist
-    private void callDeliveryStart(){
 
-        Delivery delivery = new Delivery();
-        delivery.setQuantity(this.getQuantity());
-        delivery.setProductId(this.getProductId());
-        delivery.setProductName(this.getProductName());
-        delivery.setDeliveryAddress(this.getCustomerAddr());
-        delivery.setCustomerId(this.getCustomerId());
-        delivery.setCustomerName(this.getCustomerName());
-        delivery.setDeliveryState(DeliveryStatus.DeliveryStarted.name());
-        delivery.setOrder(this);
+- 3번의 retry를 수행하는데 Retry시 백오프 초기간격이 1초, 이후 최대 1초 간격으로 retry를 실행한다. 
+- Inventory 서비스의 PolicyHandler.java에서 아래 오류 발생 코드를 주입한다: 
 
-        // 배송 시작
-        DeliveryService deliveryService = Application.applicationContext.getBean(DeliveryService.class);
-        deliveryService.startDelivery(delivery);
+```java
+@StreamListener(KafkaProcessor.INPUT)
+    public void wheneverOrderPlaced_DecreaseStock(@Payload OrderPlaced orderPlaced) {
+
+			...
+				
+        throw new RuntimeException(); //always fail
+
     }
 ```
 
-- Order.java의 startDelivery 메서드에 디버그 포인트 설치
-- 라인번호(84) 앞을 클릭하면, 빨간색의 원(breakpoint)이 나타남
- 
-- 주문 생성  
+- Order와 Product 마이크로서비스를 기동한다.
+```bash
+cd order
+mvn spring-boot:run
 ```
-http localhost:8081/orders productId=1 quantity=3 customerId="1@uengine.org" customerName="hong" customerAddr="seoul"
-```
-
-- DeliveryServiceImpl.java 를 통해서 배송처리가 되는 Monolith 임을 확인.
-
-#### 기존 Monolith 구현체 제거, FeignClient 의 활성화
-
-- DeliveryServiceImpl.java 제거 
-- DeliveryService.java 의 주석 제거
-
-```
-package com.example.template.delivery;
-
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-
-
-@FeignClient(name ="delivery", url="${api.url.delivery}")
-public interface DeliveryService {
-
-    @RequestMapping(method = RequestMethod.POST, value = "/deliveries", consumes = "application/json")
-    void startDelivery(Delivery delivery);
-
-}
-
-```
-- Monolith 서비스를 재기동 한다.
-
-- 신규 배송 서비스 기동 확인 (8082 port)  
-    - http localhost:8082
-
-- 주문 생성  
-```
-http localhost:8081/orders productId=1 quantity=3 customerId="1@uengine.org" customerName="hong" customerAddr="seoul"
-```
-- 주문 요청시 배송서비스가 호출되어 배송처리가 원격 마이크로서비스에 의해 처리된 것을 확인
-
-```
-http localhost:8082/deliveries
+```bash
+cd inventory
+mvn spring-boot:run
 ```
 
-- 디버거를 통하여 Order.java 의 deliveryService.startDelivery(...) 호출의 deliveryService 객체가 Proxy 객체로 변경된 것을 확인
-
-
-#### Service Clear
-- 다음 Lab을 위해 기동된 모든 서비스 종료
-
+- 재고를 등록한다
 ```
-fuser -k 8081/tcp
-fuser -k 8082/tcp
+http :8082/inventories id=1 stock=1000
+```
+- Order 서비스에 포스팅하여 Kafka Event를 발행한다.
+```
+http :8081/orders productId=1 qty=3
 ```
 
-## FeignClient 관련설정
-- pom.xml :  feignclient dependency
-```
-		<!-- feign client -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-openfeign</artifactId>
-		</dependency>
+- Inventory에서 Message를 subscribe하여 내용을 출력한다. 
+- throw new RuntimeException에 의해 Kafka retry가 수행되는지 Console의 log로 확인한다.
 
+- 허나, 
+- 해당 메시지는 처리될 수 없으므로 파티션 Lag가 항상 잔존하게 된다.
+```sh
+./kafka-consumer-groups --bootstrap-server localhost:9092 --group inventory --describe
 ```
-- Application.java :  @EnableFeignClients 애노테이션
+- 이는 별도의 Topic에 저장한 후 백오피스에서 처리해야 할 대상인 것이다. 
 
-#### 상세설명
-<iframe width="100%" height="100%" src="https://www.youtube.com/embed/ELH2Na8mWSw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+#### Kafka Dead Letter Queue(DLQ)
+
+- Kafka에서 retry를 통해서도 처리하지 못하는 message를 Posion pill이라고 한다.
+- Kafka에서 Posion pill은 별도의 메시지 저장소인 DLQ로 보내지게 된다. 
+- DLQ는 또 하나의 topic이며 Consumer에서 정상적으로 처리되지 못한 message들이 쌓여있다. 
+- DLQ를 설정하기 위해서 아래와 같이 Inventory의 application.yml를 변경한다. 
+- cloud.stream.kafka 아래에 있는 아래 설정을 주석해제 한다. 
+```yaml
+bindings:
+  event-in:
+    consumer:
+      enableDlq: true
+      dlqName: dlq-kafkatest
+      dlqPartitions: 1
+```
+
+- 저장 후 Inventory 마이크로서비스를 재기동한다.
+
+> 서비스가 기동되면서 Retry를 반복하게 되고, 그래도 처리하지 못한 메시지를 DLQ로 보내는 것이 Console에 확인된다.
+> Sent to DLQ  a message with key='null' and payload='{123, 34, 101, 118, 101, 110, 116, 84, 121, 112, 1...' received from 0
+
+- 설정에서 지정한 DLQ 토픽이 생성되었는지 확인한다.
+```sh
+cd kafka
+docker-compose exec -it kafka /bin/bash
+cd /bin
+./kafka-topics --bootstrap-server http://localhost:9092  --list
+```
+
+#### Kafka DLQ Test
+
+- Order 서비스에 포스팅하여 Kafka Event를 추가 발행한다.
+```
+http POST :8081/orders productId=1 qty=1
+```
+- Product에서 retry 3번 시도 후, 자동으로 DLQ로 보낸다. 
+- 아래 명령어를 통해 DLQ에 해당 message가 쌓였는지 확인한다. 
+```sh
+./kafka-console-consumer --bootstrap-server http://localhost:9092 --topic dlq-kafkatest --from-beginning
+```
+- 커밋모드가 자동일때 Dlq에 처리되지 않은 메세지를 보낸 후, 자동으로 Offset을 증가시켜 Lag가 쌓이지 않게 된다.
+```sh
+./kafka-consumer-groups --bootstrap-server localhost:9092 --group inventory --describe
+```
 

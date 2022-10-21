@@ -7,6 +7,8 @@ next: ''
 
 # [Service Mesh] Istio 를 통한 서비스 회복성 Part1 - 타임아웃/재시도
 
+# [Service Mesh] Istio 를 통한 서비스 회복성 Part1 - 타임아웃/재시도
+
 ### Istio Timeout & Retry
 
 - 주문서비스와 배송서비스를 활용해 이스티오가 제공하는 Service Resiliency 기능 중, '타임아웃'과 '재시도'에 대해 실습한다. 

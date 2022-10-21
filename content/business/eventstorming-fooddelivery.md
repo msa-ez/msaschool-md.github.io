@@ -5,6 +5,8 @@ sidebar: 'business'
 
 # [이벤트스토밍] DDD Food Delivery 예제
 
+# [이벤트스토밍] DDD Food Delivery 예제
+
 ### Food Delivery 예제
 
 아래 기능적, 비기능적 요구사항을 충족하도록 시나리오대로 이벤트스토밍 하시오.

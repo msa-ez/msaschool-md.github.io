@@ -73,7 +73,7 @@
                         font-size: 14px;
                         font-weight: 700;
                         cursor:pointer;"
-                        onclick="location.href='https://labs.msaez.io/#/'"
+                        onclick="location.href='https://labs.msaez.io/#/courses/cna-full/public-full-2022-hw'"
                     ><span style="color:white;">실 습 하 기</span>
                     </v-btn>
                 </div>

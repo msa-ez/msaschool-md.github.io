@@ -7,6 +7,8 @@ next: ''
 
 # AWS Cloud Setup(EKS, ECR 설정)
 
+# AWS Cloud Setup(EKS, ECR 설정)
+
 ## 아마존 IAM 체계
 AWS IAM 체계는 다음의 AWS ID 와 사용자 이름, 사용자 액세스 키, 스크릿 키 같은 여러가지 ID와 패스워드들을 가지고 있다. 
 1. AWS ID:  숫자로 채번된 사용자의 ID
@@ -41,16 +43,16 @@ Default output format : json
 ```
 > 리젼은 
 
-> (오레곤)us-west-2 --> User 1 ~ 5
+> (도쿄)ap-northeast-1 --> User 1 ~ 5
 > (오사카)ap-northeast-3 - user 6 ~ 10 
-> (런던)eu-west-2 - user 11 ~ 15
+> (서울)ap-northeast-2 - user 11 ~ 15
 > (싱가포르)ap-southeast-1 - user 16 ~ 20
-> (오하이오)us-east-2 - 21 ~ 25
-> (버지니아 북부)us-east-1 - user 26 ~ 30
+> (시드니)ap-southeast-2 - user 21 ~ 25
+> (아일랜드)eu-west-1 - user 26 ~ 30
 
 ## 클러스터 생성
 ```
-eksctl create cluster --name [mycluster-userid] --version 1.19 --spot --managed --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 3
+eksctl create cluster --name [mycluster-userid] --version 1.21 --spot --managed --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 3
 ```
 
 생성된 클러스터의 API-Server 주소를 나중에 코드빌드에 설정해주어야 하기 때문에 생성된 후에 다시 확인해야 한다.
@@ -60,13 +62,12 @@ AWS 콘솔에 로그인하여 EKS 서비스가 잘 생성되었는지 확인한�
 
 > 클러스터 제거할땐:  
 >  eksctl delete cluster [mycluster]
->  이름을 까먹었을때 
->  eksctl get clusters
 
 ### 클러스터에 접속하기 위한 설정 다운로드
 ```
-aws eks --region ap-northeast-2 update-kubeconfig --name [Cluster Name]
+aws eks update-kubeconfig --name [Cluster Name]
 ```
+> cluster name 을 잊었다면, eksctl get clusters 하면 클러스터명과 리전명이 나타납니다.
 
 접속이 정상적으로 되었다면:
 
@@ -87,10 +88,15 @@ aws --region "리전명" ecr get-login-password
 위의 문자열을 docker login 명령과 함께 -p 옵션으로 붙여넣기 한다. 이때 registry 서버 주소도 같이 넘겨준다:
 
 ```
-docker login --username AWS -p 아주긴도커패스워드 [AWS유저아이디-숫자로만된].dkr.ecr.[리전명].amazonaws.com
-```
-```
-docker login --username AWS -p 아주긴도커패스워드 979050235289.dkr.ecr.ap-northeast-2.amazonaws.com
+##ECR 이용시
+1) docker login --username AWS -p 아주긴도커패스워드 [AWS유저아이디-숫자로만된].dkr.ecr.[리전명].amazonaws.com
+
+ex) docker login --username AWS -p 아주긴도커패스워드 979050235289.dkr.ecr.ap-northeast-2.amazonaws.com
+
+## Docker Hub 이용
+docker login
+- dockerhub ID
+- dockerhub PW
 ```
 
 잘 로그인되었다면, 앞서 예제에서 다루었던 order 마이크로 서비스를 push 해보자
@@ -108,17 +114,31 @@ docker login --username AWS -p 아주긴도커패스워드 979050235289.dkr.ecr.
 
 
 ```
+##ECR 이용하는 경우
 git clone https://github.com/event-storming/monolith
 
 cd monolith
 mvn package -B
 docker build -t [AWS유저아이디-숫자로만된].dkr.ecr.ap-northeast-2.amazonaws.com/order:v1 .
 docker push [AWS유저아이디-숫자로만된].dkr.ecr.ap-northeast-2.amazonaws.com/order:v1
+
+##Docker Hub를 이용하는 경우 
+git clone https://github.com/event-storming/monolith
+
+cd monolith
+mvn package -B
+docker build -t [DockerHub ID]/monolith:v1 .
+docker push [DockerHub ID]/monolith:v1
+
 ```
 
 push 가 잘되었다면 ECR 의 웹UI 에 이미지가 표시될 것이며,  다음명령으로 Deploy 가 잘 되는지 확인한다:
 ```
+##ECR을 이용하는 경우
 kubectl create deploy order --image=[AWS유저아이디-숫자로만된].dkr.ecr.ap-northeast-2.amazonaws.com/order:v1
+
+##Docker Hub를 이용하는 경우
+kubectl create deploy order --image=[Docker HubID]/monolith:v1
 ```
 다음과 같이 po 를 확인한다:
 ```

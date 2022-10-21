@@ -7,6 +7,8 @@ next: ''
 
 # Kubernetes Basic Commands
 
+# Kubernetes Basic Commands
+
 ### 컨테이너 오케스트레이션 무작정 따라해 보기 
 
 #### 주문서비스 생성하기 
@@ -66,6 +68,7 @@ kubectl get service -w
 ```
 
 > External IP를 얻어오는데 오래걸리거나, ALB 등이 연결되는데, 시간이 걸리는 경우 다음의 port-forwarding 명령으로 localhost 에 접속할 수 있다: 
+
 ```
 # 새 터미널
 kubectl port-forward deploy/order 8080:8080
@@ -79,6 +82,7 @@ http localhost:8080
 - Ctrl + C를 눌러 모니터링 모드 종료하기 
 
 접속테스트:
+
 ```
 # http a78bb72215adc4a7c9db56a0c9acc457-1497647582.ap-northeast-2.elb.amazonaws.com:8080
 HTTP/1.1 200 
@@ -133,9 +137,8 @@ kubectl get pod
 
 #### YAML 기반 서비스 배포하기
 
-- Cloud IDE 메뉴 > File > Folder > YAML 입력
-- 생성한 폴더 하위에 아래 파일 생성
-- Cloud IDE 메뉴 > File > New File > order.yaml 입력 
+- GitPod > Explorer 에서 마우스 오른쪽 클릭 > New Folder > Lab 입력 
+- Lab 폴더 마우스 오른쪽 클릭 > New File > order.yaml 입력
 - 아래 내용 복사하여 붙여넣기
 
 ```
