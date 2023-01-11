@@ -1,6 +1,6 @@
-const c1 = () => import(/* webpackChunkName: "page--src--templates--markdown-page-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/templates/MarkdownPage.vue")
-const c2 = () => import(/* webpackChunkName: "page--src--pages--404-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/pages/404.vue")
-const c3 = () => import(/* webpackChunkName: "page--src--pages--index-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/pages/Index.vue")
+const c1 = () => import(/* webpackChunkName: "page--src-templates-markdown-page-vue" */ "C:\\Users\\강지원\\Desktop\\uengine\\msaschool-md.github.io\\src\\templates\\MarkdownPage.vue")
+const c2 = () => import(/* webpackChunkName: "page--src-pages-404-vue" */ "C:\\Users\\강지원\\Desktop\\uengine\\msaschool-md.github.io\\src\\pages\\404.vue")
+const c3 = () => import(/* webpackChunkName: "page--src-pages-index-vue" */ "C:\\Users\\강지원\\Desktop\\uengine\\msaschool-md.github.io\\src\\pages\\Index.vue")
 
 export default [
   {
@@ -8,7 +8,19 @@ export default [
     component: c1
   },
   {
+    path: "/operations/ops-service-mesh-istio-2/",
+    component: c1
+  },
+  {
+    path: "/operations/service/",
+    component: c1
+  },
+  {
     path: "/operations/ops-deploy-my-app/",
+    component: c1
+  },
+  {
+    path: "/operations/ops-persistence-volume-efs/",
     component: c1
   },
   {
@@ -32,6 +44,10 @@ export default [
     component: c1
   },
   {
+    path: "/operations/ops-pod-status/",
+    component: c1
+  },
+  {
     path: "/operations/ops-autoscale/",
     component: c1
   },
@@ -52,15 +68,15 @@ export default [
     component: c1
   },
   {
-    path: "/operations/ops-service/",
-    component: c1
-  },
-  {
     path: "/operations/ops-utility/",
     component: c1
   },
   {
-    path: "/operations/msa-logging/",
+    path: "/development/understanding-jpa-based-single-microservice/",
+    component: c1
+  },
+  {
+    path: "/operations/microservice-logging/",
     component: c1
   },
   {
@@ -69,6 +85,10 @@ export default [
   },
   {
     path: "/operations/k8s-monitoring/",
+    component: c1
+  },
+  {
+    path: "/development/token-based-auth/",
     component: c1
   },
   {
@@ -96,15 +116,31 @@ export default [
     component: c1
   },
   {
-    path: "/development/oauth2/",
+    path: "/development/pub-sub/",
     component: c1
   },
   {
-    path: "/development/oauth2withkeycloak/",
+    path: "/development/pubsub-deadline/",
     component: c1
   },
   {
-    path: "/development/kafka-manual-commit/",
+    path: "/development/pubsub-idempotency/",
+    component: c1
+  },
+  {
+    path: "/development/oauth2with-keycloak/",
+    component: c1
+  },
+  {
+    path: "/development/ops-docker/",
+    component: c1
+  },
+  {
+    path: "/operations/apply-security-to-12st-mall/",
+    component: c1
+  },
+  {
+    path: "/development/monolith-2-misvc/",
     component: c1
   },
   {
@@ -112,27 +148,11 @@ export default [
     component: c1
   },
   {
-    path: "/development/keycloak-oauth2-1/",
+    path: "/development/kafka-basic/",
     component: c1
   },
   {
-    path: "/development/keycloak-oauth2-2/",
-    component: c1
-  },
-  {
-    path: "/development/keycloak-oauth2-3/",
-    component: c1
-  },
-  {
-    path: "/development/monolith2misvc/",
-    component: c1
-  },
-  {
-    path: "/operations/apply-security/",
-    component: c1
-  },
-  {
-    path: "/development/kafka-base/",
+    path: "/development/kafka-connect/",
     component: c1
   },
   {
@@ -144,11 +164,19 @@ export default [
     component: c1
   },
   {
-    path: "/development/front-end/",
+    path: "/development/gateway/",
     component: c1
   },
   {
-    path: "/development/gateway/",
+    path: "/development/dp-cqrs/",
+    component: c1
+  },
+  {
+    path: "/development/dp-frontend/",
+    component: c1
+  },
+  {
+    path: "/development/dp-graphql/",
     component: c1
   },
   {
@@ -160,19 +188,19 @@ export default [
     component: c1
   },
   {
-    path: "/development/cna-pubsub/",
+    path: "/development/circuit-breaker/",
     component: c1
   },
   {
-    path: "/development/cna-pubsub2/",
+    path: "/development/cna-start/",
     component: c1
   },
   {
-    path: "/development/circuitbreaker/",
+    path: "/development/compensation-correlation/",
     component: c1
   },
   {
-    path: "/development/advanced-connect/",
+    path: "/development/contract-test/",
     component: c1
   },
   {
