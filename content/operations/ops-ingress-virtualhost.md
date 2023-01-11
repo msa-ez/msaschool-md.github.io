@@ -9,18 +9,20 @@ next: ''
 
 # Ingress - Virtual Host based
 
-## Virtual Host based Ingress Example
+## Ingress setting for Istio Monitoring System 
 
 ```
-apiVersion: "extensions/v1beta1"
+apiVersion: networking.k8s.io/v1
 kind: "Ingress"
 metadata: 
-  name: "istio-ingress"
-  namespace: "istio-system"
+  name: "shopping-ingress"
+  namespace: "istio-system"  
   annotations: 
-    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressclass.kubernetes.io/is-default-class: "true"
 spec: 
-  rules: 
+  ingressClassName: nginx
+  rules:
     - host: "kiali.service.com"
       http: 
         paths: 
@@ -28,9 +30,11 @@ spec:
             path: /
             pathType: Prefix
             backend: 
-              serviceName: kiali
-              servicePort: 20001
-
+              service:
+                name: kiali
+                port:
+                  number: 20001
+                  
     - host: "prom.service.com"
       http: 
         paths: 
@@ -38,8 +42,10 @@ spec:
             path: /
             pathType: Prefix
             backend: 
-              serviceName: prometheus
-              servicePort: 9090
+              service:
+                name: prometheus
+                port:
+                  number: 9090
 
     - host: "gra.service.com"
       http: 
@@ -48,11 +54,11 @@ spec:
             path: /
             pathType: Prefix
             backend: 
-              serviceName: grafana
-              servicePort: 3000
-
+              service:
+                name: grafana
+                port:
+                  number: 3000
 ```
-
 을 ingress.yaml 파일로 만들어 저장한후 생성한다
 
 ```

@@ -9,27 +9,26 @@ next: ''
 
 # [GitOps] Argo Rollout 와 Istio 를 통한 카나리 배포
 
+## Argo Rollout 을 기반한 카나리 배포
+
+<iframe width="1155" height="722" src="https://www.youtube.com/embed/KDrDEMfWygo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
 - ops-argo-rollout-canary-istio
 - [운영] Argo Rollout 와 Istio 를 통한 카나리 배포
 - Argo Rollout 과 Istio 의 Traffic Management 를 통하여 안정적인 카나리아 배포를 실습한다.
 
----
 
-
-# Argo Rollout 을 기반한 카나리 배포
-
-<iframe width="1155" height="722" src="https://www.youtube.com/embed/KDrDEMfWygo" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-## Argo Rollout 설치
+### Argo Rollout 설치
 터미널에 아래를 입력하여 argo rollout을 설치한다.
 
 ```
 kubectl create ns argo-rollouts
 
-kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/download/v1.0.0-rc1/install.yaml
+kubectl apply -n argo-rollouts -f https://github.com/argoproj/argo-rollouts/releases/download/v1.3.1/install.yaml
 ```
 
-## Argo Rollout 객체의 생성
+### Argo Rollout 객체의 생성
 
 다음 내용으로 rollout.yaml 파일을 생성한다.
 ```
@@ -49,7 +48,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: jinyoung/app:blue
+        image: nginx:1.19.10
         ports:
         - containerPort: 80
   minReadySeconds: 30
@@ -91,17 +90,14 @@ spec:
     type: "LoadBalancer"
 ```
 
-## Argo CLI / Dashboard 의 설치
+### Argo CLI / Dashboard 의 설치
 argo CLI 를 우선 설치:
 
 ```
-curl -LO https://github.com/argoproj/argo-rollouts/releases/download/v1.0.0-rc1/kubectl-argo-rollouts-linux-amd64
-
+curl -LO https://github.com/argoproj/argo-rollouts/releases/download/v1.3.1/kubectl-argo-rollouts-linux-amd64
 chmod +x ./kubectl-argo-rollouts-linux-amd64
-
 sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
-
-kubectl argo rollouts version  # 1.0.0 으로 확인되어야 함
+kubectl argo rollouts version  # 1.3.1 으로 확인되어야 함
 ```
 
 Argo CLI로 모니터링하기:
@@ -127,12 +123,9 @@ kubectl argo rollouts set image example-rollout  nginx=jinyoung/app:blue
 ```
 watch http <Rollout 서비스의 EXTERNAL IP>
 ```
-# Istio 를 통한 카나리 배포
+## Istio 를 통한 카나리 배포
 다음의 Rollout 은 Virtual Service 의 Traffic 배분을 매 10초 간격으로 조정하면서 카나리 배포를 실시한다:
 ```
-
-
-
 apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
@@ -262,8 +255,8 @@ spec:
   - name: canary   # referenced in canary.trafficRouting.istio.destinationRule.canarySubsetName
     labels:        # labels will be injected with canary rollouts-pod-template-hash value
       app: order
-  - name: stable   # referenced in canary.trafficRouting.istio.destinationRule.stableSubsetName
-    labels:        # labels will be injected with canary rollouts-pod-template-hash value
+  - name: stable   # referenced in stable.trafficRouting.istio.destinationRule.stableSubsetName
+    labels:        # labels will be injected with stable rollouts-pod-template-hash value
       app: order
 
 ```

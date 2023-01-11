@@ -5,14 +5,18 @@ prev: ''
 next: ''
 ---
 
-# 12번가 마이크로서비스 라우터(Service) 적용
+# 12번가 마이크로서비스 라우터(Service) 생성
 
-# 12번가 마이크로서비스 라우터(Service) 적용
+# 12번가 마이크로서비스 라우터(Service) 생성
 
 ### The Route for Containers : Service
 
-- 마이크로서비스들의 라우터인 Serivce Scope에 대해 실습한다.
-- 외부에서 마이크로서비스까지 요청이 전달되는 과정에 Kube Proxy의 역할에 대해 이해한다.
+쿠버네티스는 클러스터에 배포된 마이크로서비스별 컨테이너에 접속하기 위해 **"Service"** 객체를 제공한다. 이 Service로 접속하게 되면 연결된 컨테이너로 요청이 프락시된다. 
+
+이번 랩에서는 이 Service에 대해 알아본다.
+
+- 마이크로서비스들의 라우터인 Serivce Scope에 대해 이해한다.
+- 마이크로서비스까지 요청이 전달되는 과정에 Kube Proxy의 역할에 대해 학습한다.
 
 ### Service basic template
 ```

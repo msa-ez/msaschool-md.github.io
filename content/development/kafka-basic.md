@@ -5,13 +5,13 @@ prev: ''
 next: ''
 ---
 
-# Kafka 기본 명령어 (New)
+# Kafka 기본 명령어 
 
-# Kafka 기본 명령어 (New)
+# Kafka 기본 명령어 
 
-### Kafka 기본 명령 이해하기
+## Kafka 기본 명령 이해하기
 
-- IDE 를 실행하기 위하여 CODE > Project IDE 를 선택하여 gitpod 에 접속한다.
+- IDE 를 실행하기 위하여 CODE > Project IDE 를 선택하여 Gitpod 에 접속한다.
 - kafka 를 docker를 통하여 실행한다:
 ```
 cd kafka

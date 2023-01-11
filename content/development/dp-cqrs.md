@@ -9,6 +9,7 @@ next: ''
 
 # Data Projection with CQRS
 
+
 ### CQRS 모델링 Practice
 
 - 주문서비스와 배송서비스의 상세 모델을 참조하여 Query 모델(Materialized View)을 설계한다.

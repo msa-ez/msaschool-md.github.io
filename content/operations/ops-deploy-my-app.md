@@ -10,9 +10,12 @@ next: ''
 # 애플리케이션 패키징,도커라이징,클러스터 배포
 
 ### 자바 애플리케이션의 패키징
+
 - 터미널을 열어서 order 와 delivery, gateway 폴더로 각각 이동하여 아래 명령어를 실행한다.
+- 실행에 앞서 마이크로서비스들이 EDA 통신하기 위한 Kafka 서버를 내 클러스터에 설치한다.
+- 설치는 마지막 랩인 "쿠버네티스 유틸리티"를 참조한다.
+
 ````
-cd shopmall
 cd order
 mvn package -B -Dmaven.test.skip=true
 ````
@@ -33,7 +36,10 @@ java -jar target/order-0.0.1-SNAPSHOT.jar
  docker images
  docker push [dockerhub ID]/order:[오늘날짜]  
 ````
-
+ - docker run 으로 실행해보기
+ ```
+ docker run  [dockerhub ID]/order:[오늘날짜]  
+ ```
 
 
 ### 클러스터에 배포
@@ -44,14 +50,28 @@ java -jar target/order-0.0.1-SNAPSHOT.jar
 - image: 부분을 push 한 이미지 명으로 수정한다:  [dockerhub ID]/order:[오늘날짜]  
 - 저장후, 다음명령:
 ```
-kubectl apply -f kubernetes/deployment.yml
+kubectl apply -f kubernetes/deployment.yaml
 
-kubectl apply -f kubernetes/service.yml
+kubectl apply -f kubernetes/service.yaml
 ```
+
+- 새 터미널 열고 port forward 
+```
+kubectl port-forward svc/order 8080:8080
+```
+
+-  접속 테스트
+```
+http :8080
+```
+
+#### Message Broker Kafka 설치
+- 클러스터에서 정상적으로 동작하기 위해서는 카프카 사전설치가 필요
+- (마지막 랩인) 쿠버네티스 유틸리티를 참조하여 카프카 설치
 
 #### 명령으로 배포 (비추)
 - order 서비스 배포
-    - kubectl create deploy order --image=[dockerhub ID]/order:latest
+    - kubectl create deploy order --image=[이미지명]
     - kubectl expose deploy order --port=8080
     
 - delivery 서비스 배포
@@ -84,6 +104,13 @@ kubectl apply -f kubernetes/service.yml
 kubectl delete deploy --all
 kubectl delete svc --all
 ```
+1. External IP 로 접속이 되지 않는 경우
+```
+kubectl port-forward svc/order 8080:8080 
+```
+한 후, localhost:8080 으로 접속
+
+1. ImagePullBackOff: 이미지 명이 잘못되었거나 push가 안된 경우 
 
 
 ### 더 많은 테스트

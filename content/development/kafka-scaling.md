@@ -5,349 +5,97 @@ prev: ''
 next: ''
 ---
 
-# Data Projection with GraphQL
+# Kafka Scaling 
 
-# Data Projection with GraphQL
+# Kafka Scaling  
 
-### GraphQL로 백엔드 데이터 통합
+### Kafka 스케일링 
 
-- GraphQL 용 Apollo Server 를 생성하기 위하여 CODE Preview > TOPPINGS 에서 "Apollo GraphQL" 선택
+#### Kafka Partition vs. Consumers
 
-<img width="697"  src="https://user-images.githubusercontent.com/487999/191050930-bca7a84e-ab92-4c41-a746-a4b40da3e58d.png">
+- Kafka Topic 생성시, default partition은 1개로 생성된다. 
+- kafka에서 하나의 Partition은 반드시 하나의 Consumer가 매칭되어 메시지를 소비한다. 
+- Partiton 수보다 동일한 Group id를 가진 Consumer 수가 많다면 일부 Consumer들은 partition에 binding되지 못해 message를 Polling 하지 못하는 현상이 일어난다. 
+- 아래의 Instruction을 따라 일부 Consumer가 메시지를 poll 해오지 못하는 현상을 확인한다. 
 
-- apollo 마이크로 서비스 폴더가 생성된 것을 확인하고, 코드를 Git 으로 PUSH 한다.
-- Project IDE 를 Open 한다.
-- 커밋된 모델의 소스코드를 반영받는다:
-
-```
-git pull && git merge origin/template
-```
-- 주문,재고,배송 서비스를 모두 기동한다.
-- 주문서비스 기동(8081)
-```
+- Order 서비스 시작
+```bash
 cd order
 mvn spring-boot:run
 ```
-- 재고서비스 기동(8082)
-```
+- inventory 서비스 시작 (port=8082)
+```bash
 cd inventory
 mvn spring-boot:run
 ```
-- 배송서비스 기동(8083)
+- inventory 2 서비스 시작 (port=8083)
+```bash
+cd inventory
+mvn spring-boot:run -Dspring-boot.run.arguments=--server.port=8083
 ```
-cd delivery
-mvn spring-boot:run
-```  
-	
-- 상품을 등록하고 해당 상품을 주문한다.
-```
-http localhost:8082/inventories id=1 stock=10
+> inventory1 서비스와는 달리 inventory2 마이크로서비스의 Console 창을 통해 파티션 할당이 일어나지 않았음을 확인할 수 있다.
+> partitions assigned: []
 
-http localhost:8081/orders productId=1 qty=1 customerId="1@uengine.org"
+- Consumer 그룹정보를 확인한다.
 ```
+cd kafka
+docker-compose exec -it kafka /bin/bash
+cd /bin
 
-- GraphQL 기동(8089)
+./kafka-topics --bootstrap-server 127.0.0.1:9092 --topic labshoppubsub --describe
+
+./kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group inventory
 ```
-cd apollo_graphql
-npm install
-yarn start
+> Inventory Group 의  Consumer (마이크로서비스 레플리카)가 2개임에도 파티션이 1개이므로, 매칭된 Consumer가  1개로 확인된다.
+
+- 실험을 위하여 8082, 8083 의 inventory 에 각각 10개의 재고를 등록한다:
 ```
-- GraphQL Playground 
-> 작성한 GraphQL Type, Resolver 명세확인, 데이터 요청 및 테스트가 가능한 워크벤치
-- Remote Explorer 에서 WebUI에 접속
-
-<img width="1161" alt="스크린샷 2022-09-23 오후 3 48 53" src="https://user-images.githubusercontent.com/58163635/191912194-88d4b4a0-44fd-4f13-a014-73fc0b503797.png">
-
-** 이 때 서비스를 Make Public 꼭 해주어야 조회가 가능하다.
-
-### 서비스 조회
-* 전체 주문서비스
-```gql
-query getOrders {
-  orders {
-    productId
-    qty
-  }
-}
+http :8082/inventories id=1 stock=10
+http :8083/inventories id=1 stock=10
 ```
-* 단일 주문서비스( id=1 주문서비스 )
-```gql
-query getOrderById {
-  order(id: 1) {
-    productId
-    qty
-  }
-}
+- 주문 4건을 등록한다:
+```
+http :8081/orders productId=1 qty=1
+http :8081/orders productId=1 qty=1
+http :8081/orders productId=1 qty=1
+http :8081/orders productId=1 qty=1
+```
+- 해당 주문에 대한 재고 감소가 8082 혹은 8083 한 곳에서만 발생한 것을 확인한다:
+```
+http :8082/inventories/1
+http :8083/inventories/1
 ```
 
+#### Kafka Partition Scale out 
 
-* 복합 서비스 조회
+- Kafka Partition을 확장한다. 
 
-
-복합적인 서비스 조회를 위하여 서브쿼리에 대한 Resolver 전략을 작성한다:
-
-- resolver.ts
-```
-const resolvers = {
-    Order: {
-        delivery: async (root, {deliveryId}, {dataSources}) => {
-            try {
-                if (root && root._links.self.href) {
-                    var parseLink = root._links.self.href.split('/')
-                    var getOrderId = parseLink[parseLink.length - 1]
-                    var deliveries = await dataSources.deliveryRestApi.getDeliveries();
-
-                    if(deliveries){
-                        var rtnVal = null
-                        Object.values(deliveries).forEach(function (delivery) {
-                            if(delivery && delivery.orderId == getOrderId){
-                                rtnVal = delivery
-                            }
-                        })
-                        return rtnVal
-                    }
-                }
-                return null;
-            } catch (e) {
-                return null;
-            }
-        },
-        
-        inventory: async (root, {productId}, {dataSources}) => {
-            if (!productId) productId = root.productId
-
-            if (productId) {
-                return await dataSources.inventoryRestApi.getInventory(productId);
-            }
-            return null;
-        }
-    },
-    Inventory: {
-        // set Query
-    },
-    Delivery: {
-        // set Query
-    },
-
-    Query: {
-        order : async (_, { id }, { dataSources }) => {
-            return dataSources.orderRestApi.getOrder(id);
-        },
-        orders : async (_, __, { dataSources }) => {
-            return dataSources.orderRestApi.getOrders();
-        },
-        inventory : async (_, { id }, { dataSources }) => {
-            return dataSources.inventoryRestApi.getInventory(id);
-        },
-        inventories : async (_, __, { dataSources }) => {
-            return dataSources.inventoryRestApi.getInventories();
-        },
-        delivery : async (_, { id }, { dataSources }) => {
-            return dataSources.deliveryRestApi.getDelivery(id);
-        },
-        deliveries : async (_, __, { dataSources }) => {
-            return dataSources.deliveryRestApi.getDeliveries();
-        },
-    }
-};
-
-export default resolvers;
-
+```sh 
+./kafka-topics --bootstrap-server 127.0.0.1:9092 --alter --topic labshoppubsub -partitions 2
 ```
 
-- Type 선언에 속성추가 :  typeDefs.ts
-```
-    type Order {
-    	id: Long! 
-			productId: String 
-			qty: Integer 
-			customerId: String 
-			amount: Double 
-			status: String 
-			address: String
-      delivery: Delivery
-      inventory: Inventory
-    }
-```
+- Inventory2 마이크로서비스를 재시작하거나 2~3분 정도 기다리면 Partition Rebalancing이 일어나면서 Inventory2 서비스도 partition assigned로 바뀌며 message를 Polling할 수 있는 상태로 변경된다.
 
-order 서비스의 연결된 product, delivery 정보조회
-```gql
-query {
-  orders {
-    qty
-    customerId
-    
-    delivery {
-      orderId
-    }
+- 토픽정보와 Consumer Group 정보를 재확인한다.
 
-    inventory{
-      stock
-    }
-  }
-
-}
-```
-- 호출결과
-```
-{
-  "data": {
-    "orders": [
-      {
-        "qty": 1,
-        "customerId": "1@uengine.org",
-        "delivery": {
-          "orderId": 1
-        },
-        "inventory": {
-          "stock": 9
-        }
-      }
-    ]
-  }
-}
-```
+> Partition 0,1 각각에 Consumer가 매핑된 것을 확인할 수 있다.
 
 
-#### GraphQL 파일 참고
-1. src/graphql/resolvers.js
-* 데이터를 가져오는 구체적인 과정을 구현     
-* 서비스의 액션들을 함수로 지정, 요청에 따라 데이터를 반환(Query), Mutation(입력, 수정, 삭제) 하는 Query 또는 구현체 작성
- 
-```
-예시)
-const resolvers = {
-  //typeDefs의 객체 유형 정보(Order, Query, Product) 호출 선언
-  
-  Query: {
-     //...
-  } 
-  Order: {
-      deliveries: (root, args, {dataSources}) => {}
 
-      //  함수명: (parent, args, context, info) => {}
-      //  * parent  : 루트에 대한 resolver의 반환 값.
-      //  * args    : 함수 호출시 args 또는 {parameter}으로 인자값.
-      //  * context : 
-            특정 작업을 위해 실행되는 모든 resolver에 전달되는 개체,
-            데이터베이스 연결과 같은 컨텍스트를 공유.
-          {dataSources}: xxx-rest-api.js와 연결된 데이터 호출.
-      //  * info    : 필드명, 루트에서 필드까지의 경로 등 작업의 실행 상태.
-  }
-}
-```
-
-2. src/graphql/typeDefs.js
-    * GraphQL 명세서에서 사용될 데이터, 요청의 타입 (gql로 생성됨)
-
-* Type Definitions
-*  객체 타입과 필드명 선언
-```
-type Delivery {
-        id: Long!
-        orderId: Long 
-        productId: Long 
-        customerId: String 
-        deliveryAddress: String 
-        deliveryState: String 
-        orders: [Order]
-        order(orderId: Long): Order
-    }
-  
-    type Order {
-        id: Long! 
-        productId: Long
-        customerId: String
-        state: String
-        deliveries: [Delivery]
-        delivery(deliveryId: Long): Delivery
-    }
-
-    // []: 배열
-    //  !: 필수값
-```
-
-3. src/restApiServer/xxx-rest-api.js
-	* apollo-datasource-rest의 해당 서비스의 호출 함수및 호출 경로 설정.
-```
-import {RESTDataSource} from 'apollo-datasource-rest';
-// apollo-datasource-rest 모듈
-
-class orderRestApi extends RESTDataSource {
-    constructor() {
-        super();
-        this.baseURL = 'http://order:8080';
-        // 해당 서비스의 호출 주소 정보.
-    }
-
-    // 함수명() 
-    async getOrders() {
-        const data = await this.get('/orders', {})
-        // baseURL 이후 url 호출 정보.
-
-        var value = this.stringToJson(data);
-        // 호출정보 String to Json 으로 변경. 
-        
-        return value
-        // 호출 정보 리턴.
-    }
-
-    async getOrder(id) {
-        // ...
-    }
-
-    stringToJson(str){
-        if(typeof str == 'string'){
-            str = JSON.parse(str);
-        }
-        return str;
-    }
-}
-```
-4. src/index.js
-    * 선언부 호출 매핑및 선언.
-```
-import {ApolloServer} from 'apollo-server';
-import resolvers from './graphql/resolvers.js';
-import typeDefs from './graphql/typeDefs.js';
-import orderRestApi from './restApiServer/order-rest-api.js'
-import deliveryRestApi from './restApiServer/delivery-rest-api.js'
-
-const server = new ApolloServer({
-    typeDefs,
-    resolvers,
-    dataSources: () => ({
-        orderRestApi: new orderRestApi(),
-        deliveryRestApi: new deliveryRestApi()
-    }),
-    // dataSources 선언 하여 xxxRestApi 호출정보.
-});
-
-server.listen({
-    port: 8089,
-}).then(({url}) => {
-    console.log(`🚀  Server ready at ${url}`);
-});
+- Order 서비스에 POST로 메시지를 발행하면 Inventory 1, Inventory 2 서비스가 차례로 메시지를 수신하기 때문에 8082, 8083이 나누어서 재고량이 1씩 감소된다.
 
 ```
+http :8081/orders productId=1 qty=1
+http :8082/inventories
+http :8083/inventories
 
+http :8081/orders productId=1 qty=1
+http :8082/inventories
+http :8083/inventories
 
-### 미션:  delivery 조회를 위한 resolver 효율화
-
-현재 주문에 대한 배송건을 찾는 로직은 전체 배송을 모두 조회한 후 orderId와 비교하는 비효율적인 조회를 하고 있다. 이를 다음과 같이 findByOrderId 를 통해 백엔드에서 DB 조회한 결과를 가져오도록 변경하기 위하여 data source 부분의 코드와 delivery 서비스를 개선하시오:
+http :8081/orders productId=1 qty=1
+http :8082/inventories
+http :8083/inventories
 
 ```
-const resolvers = {
-    Order: {
-        delivery: async (root, {deliveryId}, {dataSources}) => {
-            var parseLink = root._links.self.href.split('/')
-            var orderId = parseLink[parseLink.length - 1]
-            var deliveries = await dataSources.deliveryRestApi.findByOrderId(orderId);
-
-            if(deliveries && deliveries.length>0)
-                return deliveries[0];
-
-            return null;
-        },
-      ...
-```
+> 물론, 실제 inventory 이 production 될때는 같은 데이터베이스를 사용하도록 production 될 것이기 때문에 재고량의 차이가 생기지는 않는다.

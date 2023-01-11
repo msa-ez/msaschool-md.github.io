@@ -5,9 +5,9 @@ prev: ''
 next: ''
 ---
 
-# Kubernetes Basic Commands
+# Kubernetes Basic Command
 
-# Kubernetes Basic Commands
+# Kubernetes Basic Command
 
 ### 컨테이너 오케스트레이션 무작정 따라해 보기 
 
@@ -68,7 +68,6 @@ kubectl get service -w
 ```
 
 > External IP를 얻어오는데 오래걸리거나, ALB 등이 연결되는데, 시간이 걸리는 경우 다음의 port-forwarding 명령으로 localhost 에 접속할 수 있다: 
-
 ```
 # 새 터미널
 kubectl port-forward deploy/order 8080:8080
@@ -82,7 +81,6 @@ http localhost:8080
 - Ctrl + C를 눌러 모니터링 모드 종료하기 
 
 접속테스트:
-
 ```
 # http a78bb72215adc4a7c9db56a0c9acc457-1497647582.ap-northeast-2.elb.amazonaws.com:8080
 HTTP/1.1 200 

@@ -9,20 +9,18 @@ next: ''
 
 # [Service Mesh] Istio
 
-## Download Istio 
+## Download & Install Istio 
 
 1.  다운로드 후, 압축을 해제한다
 
-    ```
-    $ curl -L https://istio.io/downloadIstio | sh -
-    ```
+```
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.14.5 TARGET_ARCH=x86_64 sh -
+```
 
 1.  Istio 패키지 폴더로 이동시킨다 
-    `istio-< istio_full_version >`:
-
-    ```
-    $ cd istio-< istio_full_version >
-    ```
+```
+cd istio-1.14.5
+```
 
    해당 디렉토리에는 다음의 내용을 포함하고 있다:
 
@@ -32,16 +30,16 @@ next: ''
 
 1.  `istioctl` 클라이언트를 PATH에 잡아준다:
 
-    ```
-    $ export PATH=$PWD/bin:$PATH
-    ```
+```
+$ export PATH=$PWD/bin:$PATH
+```
 
 ## Install Istio 
 
 1.  기본적인 구성인 `demo` 를 기반으로 설치한다. 
 
 ```
-   $ istioctl install --set profile=demo -y
+$ istioctl install --set profile=demo --set hub=gcr.io/istio-release
     ✔ Istio core installed
     ✔ Istiod installed
     ✔ Egress gateways installed
@@ -52,7 +50,7 @@ next: ''
 1.  Envoy 사이드카를 생성하는 Pod 들에 자동적으로 주입하게 하기 위해 다음의 설정을 추가한다:
 
 ```
-   $ kubectl label namespace default istio-injection=enabled
+$ kubectl label namespace default istio-injection=enabled
     namespace/default labeled
 ```
 
@@ -61,46 +59,49 @@ next: ''
 1.  `Bookinfo` 샘플 애플리케이션을 설치한다
 
 ```
-    $ kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
-    service/details created
-    serviceaccount/bookinfo-details created
-    deployment.apps/details-v1 created
-    service/ratings created
-    serviceaccount/bookinfo-ratings created
-    deployment.apps/ratings-v1 created
-    service/reviews created
-    serviceaccount/bookinfo-reviews created
-    deployment.apps/reviews-v1 created
-    deployment.apps/reviews-v2 created
-    deployment.apps/reviews-v3 created
-    service/productpage created
-    serviceaccount/bookinfo-productpage created
-    deployment.apps/productpage-v1 created
+$ kubectl apply -f samples/bookinfo/platform/kube/bookinfo.yaml
+
+service/details created
+serviceaccount/bookinfo-details created
+deployment.apps/details-v1 created
+service/ratings created
+serviceaccount/bookinfo-ratings created
+deployment.apps/ratings-v1 created
+service/reviews created
+serviceaccount/bookinfo-reviews created
+deployment.apps/reviews-v1 created
+deployment.apps/reviews-v2 created
+deployment.apps/reviews-v3 created
+service/productpage created
+serviceaccount/bookinfo-productpage created
+deployment.apps/productpage-v1 created
 ```
 
 1. 애플리케이션이 시작되고 각 Pod들이 준비상태가 된다. Istio Sidecar들이 같이 배포되었을 것이다.
 
 ```
-    $ kubectl get services
-    NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
-    details       ClusterIP   10.0.0.212      <none>        9080/TCP   29s
-    kubernetes    ClusterIP   10.0.0.1        <none>        443/TCP    25m
-    productpage   ClusterIP   10.0.0.57       <none>        9080/TCP   28s
-    ratings       ClusterIP   10.0.0.33       <none>        9080/TCP   29s
-    reviews       ClusterIP   10.0.0.28       <none>        9080/TCP   29s
+$ kubectl get services
+
+NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+details       ClusterIP   10.0.0.212      <none>        9080/TCP   29s
+kubernetes    ClusterIP   10.0.0.1        <none>        443/TCP    25m
+productpage   ClusterIP   10.0.0.57       <none>        9080/TCP   28s
+ratings       ClusterIP   10.0.0.33       <none>        9080/TCP   29s
+reviews       ClusterIP   10.0.0.28       <none>        9080/TCP   29s
 ```
 
   그리고 다음과 같이 확인한다:
 
 ```
-    $ kubectl get pods
-    NAME                              READY   STATUS    RESTARTS   AGE
-    details-v1-558b8b4b76-2llld       2/2     Running   0          2m41s
-    productpage-v1-6987489c74-lpkgl   2/2     Running   0          2m40s
-    ratings-v1-7dc98c7588-vzftc       2/2     Running   0          2m41s
-    reviews-v1-7f99cc4496-gdxfn       2/2     Running   0          2m41s
-    reviews-v2-7d79d5bd5d-8zzqd       2/2     Running   0          2m41s
-    reviews-v3-7dbcdcbc56-m8dph       2/2     Running   0          2m41s
+$ kubectl get pods
+
+NAME                              READY   STATUS    RESTARTS   AGE
+details-v1-558b8b4b76-2llld       2/2     Running   0          2m41s
+productpage-v1-6987489c74-lpkgl   2/2     Running   0          2m40s
+ratings-v1-7dc98c7588-vzftc       2/2     Running   0          2m41s
+reviews-v1-7f99cc4496-gdxfn       2/2     Running   0          2m41s
+reviews-v2-7d79d5bd5d-8zzqd       2/2     Running   0          2m41s
+reviews-v3-7dbcdcbc56-m8dph       2/2     Running   0          2m41s
 ```
 
 
@@ -111,7 +112,7 @@ next: ''
 1.  모든것이 제대로 된 후에는 다음의 주소로 접속하여 웹 페이지 HTML 콘텐츠 내용을 확인할 수 있어야 한다.
 
 ```
-    $ kubectl exec "$(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}')" -c ratings -- curl -sS productpage:9080/productpage | grep -o "<title>.*</title>"
+$ kubectl exec "$(kubectl get pod -l app=ratings -o jsonpath='{.items[0].metadata.name}')" -c ratings -- curl -sS productpage:9080/productpage | grep -o "<title>.*</title>"
     <title>Simple Bookstore App</title>
 ```
 
@@ -122,7 +123,7 @@ next: ''
 1.  애플리케이션들을 Istio Gateway 에 묶기위한 설정들을 배포한다:
 
 ```
-    $ kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
+$ kubectl apply -f samples/bookinfo/networking/bookinfo-gateway.yaml
     gateway.networking.istio.io/bookinfo-gateway created
     virtualservice.networking.istio.io/bookinfo created
 ```
@@ -130,8 +131,8 @@ next: ''
 1.  발생한 문제가 없는지 확인한다:
 
 ```
-    $ istioctl analyze
-    ✔ No validation issues found when analyzing namespace: default.
+$ istioctl analyze
+✔ No validation issues found when analyzing namespace: default.
 ```
 
 ### Determining the ingress IP and ports
@@ -164,14 +165,14 @@ $ export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway
 1.  그런다음 다음의 환경변수에 Gateway URL을 생성할 수 있다: `GATEWAY_URL`:
 
 ```
-    $ export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
+$ export GATEWAY_URL=$INGRESS_HOST:$INGRESS_PORT
 ```
 
 1.  환경변수에 IP address 와 port 가 잘 설정되었는지 확인한다:
 
 ```
-    $ echo "$GATEWAY_URL"
-    192.168.99.100:32194
+$ echo "$GATEWAY_URL"
+192.168.99.100:32194
 ```
 
 ### Verify external access 
@@ -181,7 +182,7 @@ $ export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway
 1.  다음의 명령을 입력하여 얻어진 url 로 브라우저를 접속하여 Bookinfo application이 잘 동작하는지 확인한다.
 
 ```
-    $ echo "http://$GATEWAY_URL/productpage"
+$ echo "http://$GATEWAY_URL/productpage"
 ```
 Bookinfo product page 를 여러번 리프래스 해본다.
 
@@ -232,10 +233,11 @@ Istio 는 다른 텔레메트리 모니터링 툴과 같이 제공이 된다. �
 1.  이를 위해 다음을 설치한다: [Kiali and the other addons]({{< github_tree >}}/samples/addons). 설치가 완료될 때까지 기다린다.
 
 ```
-    $ kubectl apply -f samples/addons
-    $ kubectl rollout status deployment/kiali -n istio-system
-    Waiting for deployment "kiali" rollout to finish: 0 of 1 updated replicas are available...
-    deployment "kiali" successfully rolled out
+$ kubectl apply -f samples/addons
+$ kubectl rollout status deployment/kiali -n istio-system
+  
+Waiting for deployment "kiali" rollout to finish: 0 of 1 updated replicas are available...
+deployment "kiali" successfully rolled out
 ```
 
 >   중간에 오류가 생길 수 있으니, 그때는 다시 명령을 보내어 설치하면 된다.

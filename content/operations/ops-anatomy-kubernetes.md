@@ -490,5 +490,3 @@ The next steps will take the configuration created and use it to configure kubel
     kubectl get svc
     curl {CLUSTER IP}:80
     ```
-
-

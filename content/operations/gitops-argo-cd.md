@@ -9,12 +9,12 @@ next: ''
 
 # [GitOps] Argo CD 를 통한 카나리 배포
 
-# Argo CD 를 통한 배포
+## Argo CD 를 통한 배포
 
-Argo CD 의 홈페이지를 방문한다:
+Argo CD 는 GitOps기반의 지속적인 배포를 지원하는 Kubernetes Plug-in 이다:
 https://argo-cd.readthedocs.io/en/stable/
 
-Getting Started 메뉴를 접속하여, argo cd 를 설치한다:
+먼저 Argo cd 를 Cluster에 설치한다:
 
 ```
 kubectl create namespace argocd
@@ -64,8 +64,15 @@ https://github.com/argoproj/argocd-example-apps.git 를 접속한 후, 이를 Fo
 > kubernetes.default.svc 가 내가 포함된 서비스의 기본 접속 주소이다.
 > namespace 를 "guestbook" 으로 줘본다.
 
-git 에 변화를 주고, 이를 동기화 시켜서 반영이 되는지 확인한다:
+Git guestbook 폴더에 변화를 주고, 이를 동기화 시켜서 반영이 되는지 확인한다:
 
 ![](https://argo-cd.readthedocs.io/en/stable/assets/guestbook-app.png)
 
 ![](https://argo-cd.readthedocs.io/en/stable/assets/guestbook-tree.png)
+
+
+### 확장미션
+
+- Argo CD Sync 옵션을 Automatic으로 수정한다.
+- Git guestbook 폴더에 이전 랩에서 'Istio 를 통한 카나리 배포'에 사용된 YAML을 복사하여 배포 스펙(guestbook-ui-deployment.yaml)에 붙여넣고 자동 Sync 및 카나리 배포를 모니터링 한다.
+- guestbook-ui-service.yaml은 삭제한다.

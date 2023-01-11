@@ -3,9 +3,9 @@ description: ''
 sidebar: 'business'
 ---
 
-# [이벤트스토밍] DDD 구글 드라이브 예제
+# [이벤트스토밍] - 구글 드라이브 예제
 
-# [이벤트스토밍] DDD 구글 드라이브 예제
+# [이벤트스토밍] - 구글 드라이브 예제
 
 ### 구글 드라이브 예제
 #### 아래 시나리오대로  이벤트 스토밍 하시오.
@@ -20,8 +20,8 @@ sidebar: 'business'
 #### Project Name : google drive
 
 #### 바운디드 컨텍스트
-1. dashboard
-2. drive
-3. indexer
-4. video processing
-5. notification
+1. drive
+2. indexer
+3. video processing
+4. notification
+5. dashboard

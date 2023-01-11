@@ -5,12 +5,12 @@ prev: ''
 next: ''
 ---
 
-# Pub/Sub 방식의 연동 - Compensation 과 Correlation (New)
+# Pub/Sub 방식의 연동 - Compensation 과 Correlation
 
-# Pub/Sub 방식의 연동 - Compensation 과 Correlation (New)
+# Pub/Sub 방식의 연동 - Compensation 과 Correlation
 
 ### Compensation and Correlation
-
+ 
 어떠한 이벤트로 인하여 발생한 변경사항들에 대하여 고객이 원하거나 어떠한 기술적 이유로 인하여 해당 트랜잭션을 취소해야 하는 경우 이를 원복하거나 보상해주는 처리를 Compensation 이라고 한다. 그리고 해당 취소건에 대하여 여러개의 마이크로 서비스 내의 데이터간 상관 관계를 키값으로 연결하여 취소해야 하는데, 이러한 관계값에 대한 처리를 Correlation 이라고 한다. 
 
 
@@ -114,7 +114,7 @@ http :8082/inventories id=1  stock=10
 
 - 다음 명령으로 주문 생성한다:     
 ```
-http localhost:8081/orders productId=1 productName="TV" qty=3
+http localhost:8081/orders productId=1 productName=TV qty=3
 ```
 - 주문에 의한 재고량 확인:
 ```
@@ -150,7 +150,7 @@ cd /bin
 
         repository().findById(Long.valueOf(orderCancelled.getProductId())).ifPresent(inventory->{
             
-            inventory.setStock(inventory.getStock() - orderCancelled.getQty()); 
+            inventory.setStock(inventory.getStock() + orderCancelled.getQty()); 
             repository().save(inventory);
 
 
@@ -162,4 +162,3 @@ cd /bin
 ```
 
 ### 확장시나리오: 배송서비스에서 주문 삭제시 배송을 취소하는 작업  
-

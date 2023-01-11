@@ -9,9 +9,9 @@ next: ''
 
 # AWS Cloud Setup(EKS, ECR 설정)
 
-## 아마존 IAM 체계
-AWS IAM 체계는 다음의 AWS ID 와 사용자 이름, 사용자 액세스 키, 스크릿 키 같은 여러가지 ID와 패스워드들을 가지고 있다. 
-1. AWS ID:  숫자로 채번된 사용자의 ID
+### 아마존 IAM 체계
+AWS IAM 체계는 다음의 AWS ID 와 사용자 이름, 사용자 액세스 키, 스크릿 키 같은 보안 자격증명 정보로 구성된다. 
+1. AWS ID:  숫자로 채번된 사용자의 ID 
 1. AWS Access Key ID:  AWS CLI 를 사용하기 위해서 제공되는 Access key
 1. AWS Secret Acess Key: 위의 Acess Key 에 대한 패스워드격
 
@@ -27,12 +27,12 @@ AWS IAM 체계는 다음의 AWS ID 와 사용자 이름, 사용자 액세스 키
 7.  액세스 키 만들기 > 
 8.  csv 파일 다운로드 
 
-## AWS 콘솔 로그인
+### AWS 콘솔 로그인
 - 로그인 URL: 강의중에 알려드릴게요
 - 사용자 이름: user01 ~ 22
 - 패스워드:  강의중에 알려드릴게요 ^^
 
-## AWS CLI 환경 설정
+### AWS CLI 환경 설정
 ```
 aws configure
 
@@ -50,12 +50,18 @@ Default output format : json
 > (시드니)ap-southeast-2 - user 21 ~ 25
 > (아일랜드)eu-west-1 - user 26 ~ 30
 
-## 클러스터 생성
+### IAM 설정 확인
+```
+aws iam list-account-aliases
+# 정상설정 시, Root계정의 별칭이 출력된다.
+```
+
+### 클러스터 생성
 ```
 eksctl create cluster --name [mycluster-userid] --version 1.21 --spot --managed --nodegroup-name standard-workers --node-type t3.medium --nodes 3 --nodes-min 1 --nodes-max 3
 ```
 
-생성된 클러스터의 API-Server 주소를 나중에 코드빌드에 설정해주어야 하기 때문에 생성된 후에 다시 확인해야 한다.
+설정된 리전에 t3.medium 타입(2CPU, 4GB)의 EC2 3개의 노드 풀을 가진 클러스터가  생성된다.
 (약 15분이 소요되기 때문에 그 사이에 다음과정을 진행하셔도 됩니다)
 
 AWS 콘솔에 로그인하여 EKS 서비스가 잘 생성되었는지 확인한다.
@@ -74,10 +80,11 @@ aws eks update-kubeconfig --name [Cluster Name]
 ```
 kubectl get nodes
 ```
-의 결과가 잘 나오면 됩니다.
+의 결과, 생성된 3개의 워크노드가 출력되면  됩니다.
 
 
-## ECR 사용하기
+### ECR 사용하기
+
 ECR 에 docker 명령을 로그인시키기 위해서 먼저 docker password 를 얻어온다:  
 ```
 aws --region "리전명" ecr get-login-password 
@@ -112,9 +119,8 @@ docker login
 6. 리포지토리 생성
 
 
-
 ```
-##ECR 이용하는 경우
+## ECR 이용하는 경우
 git clone https://github.com/event-storming/monolith
 
 cd monolith

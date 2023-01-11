@@ -123,4 +123,3 @@ siege -c10 -t10S -v http://delivery.mall:8080
 - 배송 마이크로서비스에 유입되는 초당 요청수가 Threshold를 초과하여, 자동확장되었음이 확인된다.
 - HPA의 Metric type이 Container Resource(CPU, MEM) 기반이 아니므로, Resource Spec. 없어도 동작한다.
 - (But) Pod의 'Evicted' 예방차원에서 Resource Spec.는 항상 YAML에 정의하는것을 추천한다.
-

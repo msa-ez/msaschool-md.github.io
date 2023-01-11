@@ -271,4 +271,3 @@ kubectl get svc -w
 ```
    - 얻어낸 EXTERNAL IP 를 복사, 브라우저에서 접속해보았을때 상품정보 json 이 출력되는지 확인:
      e.g. http://35.243.124.94:8080/products
-

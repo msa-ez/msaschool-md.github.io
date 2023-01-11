@@ -13,38 +13,43 @@ next: ''
 
 ### Ingress 의 설정
 
-주문, 상품, 배송 서비스를 분기하는 Ingress 를 생성한다:
+주문, 상품, 배송 서비스를 분기하는 라우팅 룰을 가진 Ingress 를 생성한다:
 
 ```
-apiVersion: "extensions/v1beta1"
+apiVersion: networking.k8s.io/v1
 kind: "Ingress"
 metadata: 
   name: "shopping-ingress"
   annotations: 
-    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressclass.kubernetes.io/is-default-class: "true"
 spec: 
+  ingressClassName: nginx
   rules: 
-    - 
+    - host: ""
       http: 
         paths: 
-          - 
-            path: /orders
+          - path: /orders
             pathType: Prefix
             backend: 
-              serviceName: order
-              servicePort: 8080
-          - 
-            path: /deliveries
+              service:
+                name: order
+                port:
+                  number: 8080
+          - path: /deliveries
             pathType: Prefix
             backend: 
-              serviceName: delivery
-              servicePort: 8080
-          - 
-            path: /products
+              service:
+                name: delivery
+                port:
+                  number: 8080
+          - path: /products
             pathType: Prefix
             backend: 
-              serviceName: product
-              servicePort: 8080
+              service:
+                name: product
+                port:
+                  number: 8080
 ```
 을 ingress.yaml 파일로 만들어 저장한후 생성한다
 
@@ -70,7 +75,6 @@ shopping-ingress   *       ???   80      7m36s
 오픈소스 ingress provider 인 nginx ingress controller 를 설치하기 위해서는 하나 이상의 kubernetes 구성요소들을 설치해야 하기 때문에 이를 쉽게 Helm Chart 를 통해서 설치할 수 있다. 
 
 
-
 #### Helm으로 Ingress Controller 설치
 - Helm repo 설정
 ```
@@ -80,14 +84,21 @@ helm repo update
 kubectl create namespace ingress-basic
 ```
 
+- Helm이 로컬에 설치되어 있지 않은 경우, Helm을 먼저 설치한다.
+- Helm 3.x 설치(권장)
+```bash
+curl https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 > get_helm.sh
+chmod 700 get_helm.sh
+./get_helm.sh
+```
+
 - nginx controller 설치
 ```
 helm install nginx-ingress ingress-nginx/ingress-nginx --namespace=ingress-basic
 ```
 
 - 설치확인
-  Ingress Controller의 EXTERNAL-IP가 
-	API Gateway 엔드포인트: 메모 必
+- Ingress Controller의 EXTERNAL-IP가 API Gateway 엔드포인트
 ```
 kubectl get all --namespace=ingress-basic
 ```
@@ -121,19 +132,25 @@ HTML 이 출력되는 것으로보아 nginx 까지는 무사히 연결된 것으
 
 order 서비스와 delivery 서비스를 잘 디플로이 해주면, 해당 path 들로 path-based routing 이 잘 이루어짐을 알 수 있다.
 
-
+### order 서비스 디플로이 하기
+```
+kubectl create deploy order --image=jinyoung/monolith-order:v20210504
+kubectl expose deploy/order --port=8080
+```
 
 ## Virtual Host based Ingress Example
 
 ```
-apiVersion: "extensions/v1beta1"
+apiVersion: networking.k8s.io/v1
 kind: "Ingress"
 metadata: 
   name: "shopping-ingress"
-  namespace: "istio-system"
+  namespace: "istio-system"  
   annotations: 
-    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    ingressclass.kubernetes.io/is-default-class: "true"
 spec: 
+  ingressClassName: nginx
   rules: 
     - host: "prom.service.com"
       http: 
@@ -142,8 +159,10 @@ spec:
             path: /
             pathType: Prefix
             backend: 
-              serviceName: prometheus
-              servicePort: 9090
+              service:
+                name: prometheus
+                port:
+                  number: 9090
 
     - host: "gra.service.com"
       http: 
@@ -152,8 +171,10 @@ spec:
             path: /
             pathType: Prefix
             backend: 
-              serviceName: grafana
-              servicePort: 3000
+              service:
+                name: grafana
+                port:
+                  number: 3000
 
 ```
 

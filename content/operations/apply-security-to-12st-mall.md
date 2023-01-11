@@ -10,13 +10,14 @@ next: ''
 # 12번가 Mall에 토큰인증 적용하기
 
 ### 12st Mall에 토큰인증 적용
-- keycloak을 클러스터에 설치하고, 권한추가, 사용자 등록 등 보안설정을 수행한다.
-- 마이크로서비스를 배포하고, 토큰기반 인증이 가능하도록 설정한 다음 배포 및 적용해 본다.
+
+본 랩에서는 Single Sign-on 솔루션 중, Redhat이 지원하는 SSO 오픈스텍인 Keycloak을 내 클러스터에 설치하고, 이를 주문 마이크로서비스에 적용해 본다.
+
 
 ### 첫번째, Keycloak 설치하기
+
 - Helm Chart 설정
 ```
-cd /home/project
 git clone https://github.com/acmexii/mall-with-keylcoak-JWT.git
 cd mall-with-keylcoak-JWT
 tar xvf keycloak.tar

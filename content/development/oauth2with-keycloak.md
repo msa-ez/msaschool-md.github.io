@@ -155,4 +155,3 @@ https://8088-acmexii-labshopmonolith-orw1glcgvae.ws-us65.gitpod.io/orders
  
  - 관리콘솔에서 등록한 사용자(user@naver.com / 1)로 인증한다.
  - 인증 성공 후, 주문서비스의 응답이 정상적으로 출력된다.
-  

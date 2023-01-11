@@ -5,254 +5,118 @@ prev: ''
 next: ''
 ---
 
-# Application Packaging with Container (Docker)
+# Kafka Retry & Dead Letter Queue 
 
-# Application Packaging with Container (Docker)
+# Kafka Retry & Dead Letter Queue 
 
-### 도커 이미지 무작정 따라해 보기   
+### Retry & DLQ 
 
-#### 이미지 기반 컨테이너 생성 
+#### Kafka Retry 
 
-```
-docker image ls
-docker run --name my-nginx -d -p 8080:80 nginx
-docker run --name my-new-nginx -d -p 8081:80 nginx
+- Consumer가 message를 처리하던 중 오류가 발생하면 해당 Message를 다시 Polling하여 처리해야 한다. 
+- 이를 Retry라고 하며, 간단하게 Kafka 설정으로 동작할 수 있다. 
 
-docker image ls
-docker container ls   # = docker ps
-```  
-
-- 서비스 확인
-  - Cloud IDE 메뉴 Labs > 포트열기 > 8080
-  - Cloud IDE 메뉴 Labs > 포트열기 > 8081
-
-- httpie 로 확인
-```
-http :8080
-http :8081
-```
-
-#### 컨테이너와 이미지 삭제하기
-
-- 삭제하려는 이미지를 사용하는 컨테이너 정리가 우선
-
-```
-docker container ls ; 실행중인 컨테이너 확인
-docker container stop my-nginx  #docker stop <containerid>
-docker container stop my-new-nginx
-docker container rm my-nginx
-docker container rm my-new-nginx
-docker image rm nginx
-docker images
-```
-- 한번에 삭제:
-```
-docker stop $(docker ps -a -q) && docker rm $(docker ps -a -q)
+- Inventory 마이크로서비스 application.yml 의 cloud.stream.bindings.event-in 하위의 설정을 주석해제하고 저장한다.
+```sh
+bindings:
+  event-in:
+    group: product
+    destination: kafkatest
+    contentType: application/json
+    consumer:
+      max-attempts: 3
+      back-off-initial-interval: 1000
+      back-off-max-interval: 1000
+      back-off-multiplier: 1.0
+      defaultRetryable: false  
 ```
 
-#### 이미지 생성
+- 3번의 retry를 수행하는데 Retry시 백오프 초기간격이 1초, 이후 최대 1초 간격으로 retry를 실행한다. 
+- Inventory 서비스의 PolicyHandler.java에서 아래 오류 발생 코드를 주입한다: 
 
-- 어플리케이션 및 이미지 빌드 스크립트(Dockerfile) 생성
-  - Cloud IDE 메뉴 > File > Folder > Docker 입력
-  - 생성한 폴더 하위에 아래 2개 파일 생성
-  - Cloud IDE 메뉴 > File > New File > index.html 입력
-  - 파일 내용에 
-  
-```
-   <h1> Hi~ My name is Hong Gil-Dong...~~~ </h1>
-```
+```java
+@StreamListener(KafkaProcessor.INPUT)
+    public void wheneverOrderPlaced_DecreaseStock(@Payload OrderPlaced orderPlaced) {
 
-- 입력 후 저장
-- Cloud IDE 메뉴 > File > New File > Dockerfile (확장자 없음)
-- 파일 내용에 
+			...
+				
+        throw new RuntimeException(); //always fail
 
-```
-    FROM nginx
-    COPY index.html /usr/share/nginx/html/
-```
- 
--  입력 후, 저장
-
-- 이미지 빌드하기
-
-```
-docker build -t apexacme/welcome:v1 .
-docker images
-docker run -p 8080:80 apexacme/welcome:v1
+    }
 ```
 
-#### 이미지 Remote Registry(Hub.docker.com)에 푸시하기
-
-- 도커허브 계정 생성
-- https://hub.docker.com 접속
-  - 가입(Sign-Up) 및 E-Mail verification 수행  
- 
+- Order와 Product 마이크로서비스를 기동한다.
+```bash
+cd order
+mvn spring-boot:run
 ```
-docker login 
-docker push apexacme/welcome:v1
-# apexacme 가 자신의 계정명인 경우
-```  
-> 주의사항:  access denied 오류가 나면, 로그인이 되지 않았거나, apexacme 를 자신의 계정명으로 저장소 명을 쓰지 않아서 입니다. e.g. apexacme --> 자신의 계정명
-
-
-#### Docker Hub에 생성된 이미지 확인  
-
-- https://hub.docker.com 접속
-- repositories 메뉴 Reload 후 Push된 이미지 확인
-
-
-#### Docker Hub 이미지 기반 컨테이너 생성  
-
-```
-docker image rm apexacme/welcome:v1
-docker run --name=welcome -d -p 8080:80 apexacme/welcome:v1
-```  
-
-- 서비스가 잘 기동 되었는지 확인:
-새 터미널을 열고 (Menu > Terminal > New Terminal)
-```
-$ http localhost:8080
-
-HTTP/1.1 200 OK
-Accept-Ranges: bytes
-Connection: keep-alive
-Content-Length: 23
-Content-Type: text/html
-Date: Wed, 12 May 2021 05:12:28 GMT
-ETag: "609b5cd7-17"
-Last-Modified: Wed, 12 May 2021 04:43:03 GMT
-Server: nginx/1.19.10
-
-<h1> Hello world </h1>
-```
-
-
-### 자바 애플리케이션의 패키징
-- 터미널을 열어서 order 와 delivery, gateway 폴더로 각각 이동하여 아래 명령어를 실행한다.
-````
+```bash
 cd inventory
-mvn package -B -Dmaven.test.skip=true
-````
-- target 폴더에 jar 파일이 생성이 되었는지 확인한다.
-```
-java -jar target/inventory-0.0.1-SNAPSHOT.jar
-```
-명령으로 실행이 가능한지 확인한다.
-- ctrl+c 를 눌러서 jar 실행에서 빠져 나온다.
-
-
-- order 와 delivery, gateway 의 최상위 root 에 Dockerfile 이 있는지 확인 한다.
-- Dockerfile 파일이 있는 경로에서 아래 명령을 실행 한다.  
-
-````
- docker login
- docker build -t [dockerhub ID]/inventory:[오늘날짜] .     
- docker images
- docker push [dockerhub ID]/inventory:[오늘날짜]  
-````
- - docker run 으로 실행해보기
- ```
- docker run  [dockerhub ID]/inventory:[오늘날짜]  
- ```
-
-
-### 다음과정 미리보기
-쿠버네티스 샌드박스: https://kubernetes.io/docs/tutorials/kubernetes-basics/deploy-app/deploy-interactive/
-
-```
-$ kubectl run myhomepage --image=jinyoung/welcome:v1
-
-deployment.apps/myhomepage created
-
-
-$ kubectl expose deploy myhomepage --port=80 --type=LoadBalancer
-
-service/myhomepage exposed
-
-
-$ kubectl get svc -w
-NAME         TYPE           CLUSTER-IP      EXTERNAL-IP                                                                   PORT(S)        AGE
-myhomepage   LoadBalancer   10.100.98.191   addef84b932ff416186e2166ff397d74-589148294.ap-northeast-2.elb.amazonaws.com   80:30271/TCP   9s
-
-
-$ http addef84b932ff416186e2166ff397d74-589148294.ap-northeast-2.elb.amazonaws.com:80
-HTTP/1.1 200 OK
-Accept-Ranges: bytes
-Connection: keep-alive
-Content-Length: 23
-Content-Type: text/html
-Date: Wed, 12 May 2021 05:36:40 GMT
-ETag: "609b5cd7-17"
-Last-Modified: Wed, 12 May 2021 04:43:03 GMT
-Server: nginx/1.19.10
-
-<h1> Hello world </h1>
-
-
-kubectl get all
-NAME                              READY   STATUS    RESTARTS   AGE
-pod/myhomepage-58dd9ffb74-kw5km   1/1     Running   0          17m
-
-NAME                 TYPE           CLUSTER-IP      EXTERNAL-IP                                                                   PORT(S)        AGE
-service/myhomepage   LoadBalancer   10.100.98.191   addef84b932ff416186e2166ff397d74-589148294.ap-northeast-2.elb.amazonaws.com   80:30271/TCP   15m
-
-NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/myhomepage   1/1     1            1           17m
-
-NAME                                    DESIRED   CURRENT   READY   AGE
-replicaset.apps/myhomepage-58dd9ffb74   1         1         1       17m
-
-
-$ kubectl get rs -w
-NAME                    DESIRED   CURRENT   READY   AGE
-myhomepage-58dd9ffb74   1         1         1       27m
-
-
-
-#### 새 터미널
-
-$ kubectl delete po --all
-
-pod "myhomepage-58dd9ffb74-wjf68" deleted
-
-
-
-### 아까 터미널에서 rs 의 desired 와 current 가 유지됨 (pod 가 재생됨)을 확인:
-
-myhomepage-58dd9ffb74   1         0         0       28m
-myhomepage-58dd9ffb74   1         1         0       28m
-myhomepage-58dd9ffb74   1         1         1       28m
-
-
+mvn spring-boot:run
 ```
 
-
-### Github Container Registry 사용하기
-
-#### Login 
+- 재고를 등록한다
 ```
-docker login ghcr.io -u <github계정명> -p <Personal Access Token>
+http :8082/inventories id=1 stock=1000
 ```
-
-* github 계정명은 이메일주소가 아닌 github 자체 계정 문자열입니다. 
-* Personal Access Token을 얻으려면, Account > Settings > Developer Settings > Personal Access Token 에서 Generate New Token 한후, 권한으로 "write package" 를 부여하신 후 생성된 토큰을 얻으면 됩니다.
-
-#### Build / Push예시
+- Order 서비스에 포스팅하여 Kafka Event를 발행한다.
 ```
-docker build -t ghcr.io/jinyoung/welcome:v2021101202 .
-
-docker push ghcr.io/jinyoung/homepage:v2021101202
+http :8081/orders productId=1 qty=3
 ```
 
-* build 시 이미지명은 앞에 꼭 ghcr.io/를 추가
-* push 시에는 항상 동일한 이미지명 준수
+- Inventory에서 Message를 subscribe하여 내용을 출력한다. 
+- throw new RuntimeException에 의해 Kafka retry가 수행되는지 Console의 log로 확인한다.
 
-#### 이미지 확인 및 접근권한설정
+- 허나, 
+- 해당 메시지는 처리될 수 없으므로 파티션 Lag가 항상 잔존하게 된다.
+```sh
+./kafka-consumer-groups --bootstrap-server localhost:9092 --group inventory --describe
+```
+- 이는 별도의 Topic에 저장한 후 백오피스에서 처리해야 할 대상인 것이다. 
 
-Account > Your Repositories > Packages 에서 확인가능
+#### Kafka Dead Letter Queue(DLQ)
 
-권한을 설정하기 위해서는 Setting package 를 클릭한 후, Set Visibility 를 클릭하고 팝업에서 Public 설정 후, 이름을 확인해주고 설정완료.
+- Kafka에서 retry를 통해서도 처리하지 못하는 message를 Posion pill이라고 한다.
+- Kafka에서 Posion pill은 별도의 메시지 저장소인 DLQ로 보내지게 된다. 
+- DLQ는 또 하나의 topic이며 Consumer에서 정상적으로 처리되지 못한 message들이 쌓여있다. 
+- DLQ를 설정하기 위해서 아래와 같이 Inventory의 application.yml를 변경한다. 
+- cloud.stream.kafka 아래에 있는 아래 설정을 주석해제 한다. 
+```yaml
+bindings:
+  event-in:
+    consumer:
+      enableDlq: true
+      dlqName: dlq-kafkatest
+      dlqPartitions: 1
+```
 
-#### 상세설명
-<iframe width="100%" height="100%" src="https://www.youtube.com/embed/RO3Mw8Gks9Q" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+- 저장 후 Inventory 마이크로서비스를 재기동한다.
+
+> 서비스가 기동되면서 Retry를 반복하게 되고, 그래도 처리하지 못한 메시지를 DLQ로 보내는 것이 Console에 확인된다.
+> Sent to DLQ  a message with key='null' and payload='{123, 34, 101, 118, 101, 110, 116, 84, 121, 112, 1...' received from 0
+
+- 설정에서 지정한 DLQ 토픽이 생성되었는지 확인한다.
+```sh
+cd kafka
+docker-compose exec -it kafka /bin/bash
+cd /bin
+./kafka-topics --bootstrap-server http://localhost:9092  --list
+```
+
+#### Kafka DLQ Test
+
+- Order 서비스에 포스팅하여 Kafka Event를 추가 발행한다.
+```
+http POST :8081/orders productId=1 qty=1
+```
+- Product에서 retry 3번 시도 후, 자동으로 DLQ로 보낸다. 
+- 아래 명령어를 통해 DLQ에 해당 message가 쌓였는지 확인한다. 
+```sh
+./kafka-console-consumer --bootstrap-server http://localhost:9092 --topic dlq-kafkatest --from-beginning
+```
+- 커밋모드가 자동일때 Dlq에 처리되지 않은 메세지를 보낸 후, 자동으로 Offset을 증가시켜 Lag가 쌓이지 않게 된다.
+```sh
+./kafka-consumer-groups --bootstrap-server localhost:9092 --group inventory --describe
+```
+
 

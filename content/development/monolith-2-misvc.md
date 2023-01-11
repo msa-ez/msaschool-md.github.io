@@ -5,15 +5,16 @@ prev: ''
 next: ''
 ---
 
-# Req/Res 방식의 MSA 연동 (New)
+# Req/Res 방식의 MSA 연동 
 
-# Req/Res 방식의 MSA 연동 (New)
+# Req/Res 방식의 MSA 연동 
 
 ### Monolith 서비스의 동작 구조 확인
 
 모노리스 기반 쇼핑몰 서비스에서 inventory 서비스를 분리하고, Feign Client 를 사용해 모노리식 쇼핑몰과 분리된 마이크로서비스 분리하는 Lab 이다.  
 Feign Client 는 기존의 로컬 객체 인터페이스를 준수하면서 실제적으로는 원격 호출(Request/Response) 방식으로 서비스간의 통신을 가능하게 하여 레가시 코드의 변경을 최소화 하여 transform하는 방법이다.
 
+이전 랩에서 실행한 GitPod 환경을 로딩한다.
 
 - monolith 서비스 기동
 ```
@@ -59,27 +60,31 @@ http localhost:8081/orders productId=1 quantity=3 customerId="1@uengine.org" cus
 
 ### 기존 Monolith에서 일부 영역을 마이크로서비스로 분리
 
+본 랩에 주어진 기본 모델을 수정하기 위해 모델을 복제(FORK)한 다음, 도구를 활용하여 가이드에 따라 커스터마이징 한다.
+
 #### 이벤트스토밍
 - bounded context 를 추가하고 이름을 "inventory"로 설정
 - inventory aggregate 객체들을 묶음 선택하여 inventory bounded context 내로 이동
 
 <img width="874" alt="image" src="https://user-images.githubusercontent.com/487999/190896320-72973cf1-c1dc-44f4-a46a-9be87d072284.png">
 
-- 재고량을 감소시키는 Command 의 추가: inventory BC 내에 Command  스티커를 추가하고, 이름을 "decrease inventory" 로 부여. 이때 Command 스티커는 Inventory Aggregate 스티커의 왼쪽에 인접하게 부착.
-- Command 의 설정:  "decrease inventory" command 를 더블클릭한후, "Controller" 를 선택. Attribute로 name: qty, type: Integer 를 추가.
+- 재고량을 감소시키는 Command 의 추가: inventory BC 내에 Command  스티커를 추가하고, 이름을 "decrease stock" 으로 부여. 이때 Command 스티커는 Inventory Aggregate 스티커의 왼쪽에 인접하게 부착.
+- Command 의 설정:  "decrease stock" command 를 더블클릭한 후, "Controller" 를 선택. Attribute로 name: qty, type: Integer 를 추가.
 
 <img width="784" alt="image" src="https://user-images.githubusercontent.com/487999/190896393-30889e96-6cbc-4e7f-9631-25c0d004635d.png">
 
-- 원격 호출선 연결:  monolith 내의 OrderPlaced Event 스티커와 inventory 의 decrease inventory Command 스티커를 연결. 이때 Req/res 라는 표시가 나타남.
+- 원격 호출선 연결:  monolith 내의 OrderPlaced Event 스티커와 inventory 의 decrease stock Command 스티커를 연결. 이때 Req/res 라는 표시가 나타남.
 
 <img width="859" alt="image" src="https://user-images.githubusercontent.com/487999/190896427-f91962cd-f8ab-4113-bd85-5abe1ada3bcd.png">
 
 #### 호출측 코드 확인과 구현
-- monolith 내에 잔존하는 inventory 관련 코드들을 모두 삭제한다 (Inventory.java, InventoryService.java, InventoryRepository.java, InventoryServiceImpl.java)
 - 이벤트 스토밍 결과 코드를 생성하고 push 한 후, Code 를 update 한다.
+> Code Preview 메뉴에서 "Commit & Push on Git" 서브 메뉴를 통해 내 GitHub에 코드를 내보낸다.
+> 그러기 위해서는 MSAEz에 내 Github 토큰이 설정되어야 한다.
+
 - monolith/../ Order.java 의 @PostPersist 내에 호출을 위해 생성된 샘플코드를 확인하고 //here 부분과 같이 수정한다:
 ```
-    @PostPersist
+     @PostPersist
     public void onPostPersist() {
         //Following code causes dependency to external APIs
         // it is NOT A GOOD PRACTICE. instead, Event-Policy mapping is recommended.
@@ -90,12 +95,11 @@ http localhost:8081/orders productId=1 quantity=3 customerId="1@uengine.org" cus
         // mappings goes here
         MonolithApplication.applicationContext
             .getBean(labshopmonolith.external.InventoryService.class)
-            .decreaseStock(Long.valueOf(getProductId()), decreaseStockCommand); //here
+            .decreaseStock((Long.valueOf(getProductId())), decreaseStockCommand); //here
 
         OrderPlaced orderPlaced = new OrderPlaced(this);
         orderPlaced.publishAfterCommit();
     }
-
 
 ```
 > 우리는 decreaseStock stub 메서드를 로컬 객체를 호출하는것처럼 호출하지만 실제적으로는 inventory 원격객체를 호출하는 결과가 될 것이다.
@@ -175,6 +179,7 @@ mvn spring-boot:run
 - 새로운 터미널에서 Kafka 서버를 기동한다.
 ```
 cd kafka
+docker-compose down
 docker-compose up
 ```
 
@@ -201,3 +206,7 @@ mvn spring-boot:run
 http :8081/orders productId=1 qty=5
 http :8082/inventories/1  # stock must be 2
 ```
+
+# 참고
+1. 파일 다운로드 받기:  터미널 열고 > zip -r test.zip ./* 하신후, 생성된 test.zip 을 우클릭 다운로드
+
