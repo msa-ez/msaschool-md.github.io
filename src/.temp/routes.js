@@ -1,6 +1,6 @@
-const c1 = () => import(/* webpackChunkName: "page--src-templates-markdown-page-vue" */ "C:\\Users\\강지원\\Desktop\\uengine\\msaschool-md.github.io\\src\\templates\\MarkdownPage.vue")
-const c2 = () => import(/* webpackChunkName: "page--src-pages-404-vue" */ "C:\\Users\\강지원\\Desktop\\uengine\\msaschool-md.github.io\\src\\pages\\404.vue")
-const c3 = () => import(/* webpackChunkName: "page--src-pages-index-vue" */ "C:\\Users\\강지원\\Desktop\\uengine\\msaschool-md.github.io\\src\\pages\\Index.vue")
+const c1 = () => import(/* webpackChunkName: "page--src--templates--markdown-page-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/templates/MarkdownPage.vue")
+const c2 = () => import(/* webpackChunkName: "page--src--pages--404-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/pages/404.vue")
+const c3 = () => import(/* webpackChunkName: "page--src--pages--index-vue" */ "/Users/dufwjdrndl/Desktop/uengine/msaschool-md.github.io/src/pages/Index.vue")
 
 export default [
   {

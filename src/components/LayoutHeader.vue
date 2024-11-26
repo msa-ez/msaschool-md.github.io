@@ -63,7 +63,9 @@
                             <g-image class="g-images" src="~/img/05_Community/04_교육상담_및_신청/image10.png"></g-image>
                         </div>
                     </div>  -->
-                    <v-btn style="background-color:#5a67d8 !important;
+                    <a href="https://labs.msaez.io/#/courses/fea33dd0-8030-11ed-9757-3db21672e322/1f2deec0-c856-11ed-aa53-950d34db487f" 
+                      target="_blank"
+                      style="background-color:#5a67d8 !important;
                         border-radius: 4px;
                         margin-left:-10px;
                         height: 36px;
@@ -73,9 +75,8 @@
                         font-size: 14px;
                         font-weight: 700;
                         cursor:pointer;"
-                        onclick="location.href='https://labs.msaez.io/#/courses/cna-full/public-full-2022-hw'"
-                    ><span style="color:white;">실 습 하 기</span>
-                    </v-btn>
+                        ><span style="color:white;">실 습 하 기</span>
+                    </a>
                 </div>
 
             </div>
