@@ -21,6 +21,7 @@
                             to="http://www.msaschool.io/operation/introduction/"
                             title="Home"
                             style="margin-right: 30px;"
+                            target="_self"
                     >
                         <HomeLogo/>
                     </g-link>
